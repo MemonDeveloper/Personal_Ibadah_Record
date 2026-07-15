@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Salah &amp; Sadaqah Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Work+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.5.0/chart.umd.min.js"></script>
+<style>
+  :root{
+    --ink:#16241f; --cream:#faf6ee; --panel:#ffffff;
+    --teal:#0e3a35; --teal-2:#155e51; --gold:#c79a4b; --gold-soft:#e6c98a;
+    --line: rgba(14,58,53,0.10); --shadow: 0 10px 30px rgba(14,58,53,0.08);
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    background:
+      radial-gradient(circle at 15% -10%, rgba(199,154,75,0.10), transparent 40%),
+      radial-gradient(circle at 100% 0%, rgba(14,58,53,0.06), transparent 45%),
+      var(--cream);
+    color:var(--ink); font-family:'Work Sans', sans-serif;
+    padding: 48px 6vw 80px; min-height:100vh;
+  }
+  .wrap{ max-width:1180px; margin:0 auto; }
+
+  header{
+    display:flex; justify-content:space-between; align-items:flex-end; gap:24px;
+    margin-bottom:44px; flex-wrap:wrap; border-bottom:1px solid var(--line); padding-bottom:28px;
+  }
+  .eyebrow{ font-size:12.5px; letter-spacing:.22em; text-transform:uppercase; color:var(--teal-2); font-weight:600; margin-bottom:10px; opacity:.85; }
+  h1{ font-family:'Amiri', serif; font-weight:700; font-size:clamp(32px,4.2vw,52px); color:var(--teal); line-height:1.05; }
+  .period{ text-align:right; font-size:14px; color:var(--ink); opacity:.65; line-height:1.6; min-width:220px; }
+  .period b{ color:var(--teal); font-weight:600; opacity:1; }
+  .refresh-btn{
+    margin-top:10px; font-size:12px; letter-spacing:.05em; text-transform:uppercase;
+    background:none; border:1px solid var(--line); color:var(--teal-2); padding:6px 14px;
+    border-radius:20px; cursor:pointer; font-family:'Work Sans'; font-weight:600;
+    transition:.2s;
+  }
+  .refresh-btn:hover{ background:var(--teal); color:#fff; border-color:var(--teal); }
+
+  #statusBar{
+    display:none; background:#fff4e6; border:1px solid #eac98a; color:#8a5a15;
+    padding:14px 18px; border-radius:12px; font-size:13.5px; margin-bottom:28px;
+  }
+  #statusBar.show{ display:block; }
+  #loadingBar{
+    text-align:center; padding:60px 0; color:var(--teal-2); font-size:14px; letter-spacing:.05em;
+  }
+  #dashboard{ display:none; }
+  #dashboard.show{ display:block; }
+
+  .hero{ display:grid; grid-template-columns: 1.15fr 1fr; gap:28px; margin-bottom:40px; }
+  @media(max-width:880px){ .hero{ grid-template-columns:1fr; } }
+  .hero-card{
+    background: linear-gradient(155deg, var(--teal) 0%, #0a2b27 100%);
+    border-radius:22px; padding:38px 40px; color:var(--cream);
+    position:relative; overflow:hidden; box-shadow:var(--shadow);
+  }
+  .hero-card::before{ content:""; position:absolute; right:-60px; top:-60px; width:240px; height:240px; border:1px solid rgba(230,201,138,0.25); border-radius:50%; }
+  .hero-card::after{ content:""; position:absolute; right:-10px; top:-10px; width:160px; height:160px; border:1px solid rgba(230,201,138,0.18); border-radius:50%; }
+  .hero-label{ font-size:13px; letter-spacing:.14em; text-transform:uppercase; opacity:.7; margin-bottom:16px;}
+  .hero-num{ font-family:'Amiri', serif; font-size:clamp(56px,6vw,88px); font-weight:700; line-height:1; color:var(--gold-soft);}
+  .hero-sub{ margin-top:14px; font-size:15px; line-height:1.6; max-width:420px; opacity:.85;}
+
+  .side-stats{ display:flex; flex-direction:column; gap:18px; }
+  .mini-stat{
+    background:var(--panel); border-radius:18px; padding:20px 24px;
+    display:flex; justify-content:space-between; align-items:center;
+    box-shadow:var(--shadow); border:1px solid var(--line); flex:1;
+  }
+  .mini-stat .l{ font-size:13.5px; color:var(--ink); opacity:.6; }
+  .mini-stat .v{ font-family:'Amiri', serif; font-size:26px; font-weight:700; color:var(--teal-2); text-align:right; }
+
+  .section-title{ display:flex; align-items:baseline; gap:12px; margin: 46px 0 20px; }
+  .section-title h2{ font-family:'Amiri', serif; font-size:24px; color:var(--teal); font-weight:700; }
+  .section-title span{ font-size:12.5px; color:var(--ink); opacity:.5; letter-spacing:.05em; }
+  .section-title::after{ content:""; flex:1; height:1px; background:var(--line); }
+  .year-filter{
+    font-family:'Work Sans', sans-serif; font-size:12.5px; font-weight:600; color:var(--teal-2);
+    background:var(--panel); border:1px solid var(--line); border-radius:20px; padding:5px 14px;
+    cursor:pointer; letter-spacing:.03em;
+  }
+
+  .rings{ display:grid; grid-template-columns:repeat(5,1fr); gap:18px; }
+  @media(max-width:900px){ .rings{ grid-template-columns:repeat(2,1fr);} }
+  @media(max-width:520px){ .rings{ grid-template-columns:1fr;} }
+  .ring-card{ background:var(--panel); border-radius:18px; padding:24px 18px 20px; text-align:center; box-shadow:var(--shadow); border:1px solid var(--line); }
+  .ring-card .name{ font-weight:600; font-size:15px; color:var(--teal); margin-bottom:14px; }
+  .ring-card svg{ width:108px; height:108px; }
+  .ring-pct{ font-family:'Amiri', serif; font-size:21px; font-weight:700; fill:var(--teal); }
+  .ring-card .counts{ margin-top:12px; font-size:12.5px; color:var(--ink); opacity:.6; line-height:1.5; }
+  .ring-card .counts b{ opacity:1; color:var(--ink); }
+  .perday-row{ margin-top:14px; padding-top:12px; border-top:1px dashed var(--line); display:flex; flex-direction:column; align-items:center; gap:6px; }
+  .perday-row label{ font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:var(--ink); opacity:.5; }
+  .perday-input{
+    width:64px; text-align:center; font-family:'Work Sans', sans-serif; font-size:13px; font-weight:600;
+    color:var(--teal-2); border:1px solid var(--line); border-radius:10px; padding:5px 6px;
+    background:var(--cream);
+  }
+  .perday-input:focus{ outline:none; border-color:var(--teal-2); }
+  .days-to-complete{ font-size:12px; font-weight:600; color:var(--gold); min-height:15px; }
+
+  .panel{ background:var(--panel); border-radius:20px; padding:30px 30px 14px; box-shadow:var(--shadow); border:1px solid var(--line); }
+  .chart-wrap{ height:320px; }
+
+  .sadaqah-grid{ display:grid; grid-template-columns: 1.3fr 1fr; gap:24px; }
+  @media(max-width:880px){ .sadaqah-grid{ grid-template-columns:1fr; } }
+  .table-scroll{ max-height:242px; overflow-y:auto; }
+  table{ width:100%; border-collapse:collapse; font-size:14px; }
+  table.sadaqa-fixed{ table-layout:fixed; }
+  th{ text-align:left; font-size:12px; text-transform:uppercase; letter-spacing:.08em; color:var(--ink); opacity:.55; font-weight:600; padding:0 6px 12px; border-bottom:1px solid var(--line); }
+  td{ padding:14px 6px; border-bottom:1px solid var(--line); color:var(--ink); }
+  tr:last-child td{ border-bottom:none; }
+  .tag{ display:inline-block; background:rgba(199,154,75,0.14); color:var(--gold); font-weight:600; font-size:12.5px; padding:3px 10px; border-radius:20px; }
+  .sadaqah-side{ display:flex; flex-direction:column; gap:18px; }
+  .amount-card{ background:linear-gradient(155deg, var(--teal-2), var(--teal)); color:var(--cream); border-radius:18px; padding:26px 26px; box-shadow:var(--shadow); }
+  .amount-card .l{ font-size:12.5px; opacity:.7; letter-spacing:.08em; text-transform:uppercase; margin-bottom:8px;}
+  .amount-card .v{ font-family:'Amiri', serif; font-size:34px; font-weight:700; color:var(--gold-soft); }
+  .amount-card .foot{ margin-top:10px; font-size:12.5px; opacity:.75; }
+
+  footer{ margin-top:56px; text-align:center; font-size:12.5px; color:var(--ink); opacity:.45; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div>
+      <div class="eyebrow">Personal Ibadah Record</div>
+      <h1>Salah &amp; Sadaqah Dashboard</h1>
+    </div>
+    <div class="period">
+      <span id="periodText">Loading tracking window…</span><br>
+      <button class="refresh-btn" onclick="loadAll()">↻ Refresh Data</button>
+    </div>
+  </header>
+
+  <div id="statusBar"></div>
+  <div id="loadingBar">Fetching live data from Google Sheets…</div>
+
+  <div id="dashboard">
+    <div class="hero">
+      <div class="hero-card">
+        <div class="hero-label">Overall Salah Completion</div>
+        <div class="hero-num" id="heroPct">—%</div>
+        <div class="hero-sub">Average of all five daily prayers logged against every day since tracking began. Updates automatically from the Daily sheet.</div>
+      </div>
+      <div class="side-stats">
+        <div class="mini-stat"><span class="l">Total prayers logged</span><span class="v" id="totalLogged">—</span></div>
+        <div class="mini-stat"><span class="l">Total prayers Remaining</span><span class="v" id="totalRemaining">—</span></div>
+        <div class="mini-stat"><span class="l">Strongest prayer</span><span class="v" id="bestPrayer">—</span></div>
+      </div>
+    </div>
+
+    <div class="section-title"><h2>Prayer-wise Completion</h2><span>% of tracked days</span><select class="year-filter" id="prayerYearFilter" onchange="onPrayerYearChange()"></select></div>
+    <div class="rings" id="ringsRow"></div>
+
+    <div class="section-title"><h2>Yearly Trend</h2><span id="yearRange"></span></div>
+    <div class="panel"><div class="chart-wrap"><canvas id="yearlyChart"></canvas></div></div>
+
+    <div class="section-title"><h2>Sadaqah Plan</h2><span id="sadaqaRange"></span><select class="year-filter" id="sadaqaYearFilter" onchange="onSadqaYearChange()"></select></div>
+    <div class="sadaqah-grid">
+      <div class="panel" style="padding-top:22px;">
+        <table class="sadaqa-fixed">
+          <colgroup><col style="width:22%"><col style="width:18%"><col style="width:14%"><col style="width:26%"><col style="width:20%"></colgroup>
+          <thead><tr><th>Month</th><th>Salary</th><th>Rate</th><th>Planned Sadaqah</th><th>Payment Date</th></tr></thead>
+        </table>
+        <div class="table-scroll">
+          <table class="sadaqa-fixed">
+            <colgroup><col style="width:22%"><col style="width:18%"><col style="width:14%"><col style="width:26%"><col style="width:20%"></colgroup>
+            <tbody id="sadaqaBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="sadaqah-side">
+        <div class="amount-card">
+          <div class="l">Planned so far</div>
+          <div class="v" id="sadaqaTotal">Rs —</div>
+          <div class="foot" id="sadaqaFoot">—</div>
+        </div>
+        <div class="mini-stat"><span class="l">Projected annual sadaqah</span><span class="v" id="sadaqaAnnual">Rs —</span></div>
+      </div>
+    </div>
+  </div>
+
+  <footer>Live from Google Sheets · Islam Timeline &nbsp;·&nbsp; <span id="lastUpdated"></span></footer>
+</div>
+
+<script>
+const SHEET_ID = '1lGKEhbhUu9T5CUHOqM4AP8cfY1IHoga5C9Z9jLGiImE';
+const PRAYER_NAMES = ['Fajr','Zuhr','Asr','Maghrib','Isha'];
+let yearlyChartInstance = null;
+
+function gvizUrl(sheetName){
+  return `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(sheetName)}&_=${Date.now()}`;
+}
+
+function parseGvizDate(v){
+  if (v === null || v === undefined) return null;
+  if (typeof v === 'string'){
+    const m = v.match(/Date\((\d+),(\d+),(\d+)/);
+    if (m) return new Date(parseInt(m[1]), parseInt(m[2]), parseInt(m[3]));
+  }
+  return null;
+}
+
+async function fetchSheetRows(sheetName){
+  const res = await fetch(gvizUrl(sheetName));
+  if (!res.ok) throw new Error('HTTP ' + res.status + ' for sheet "' + sheetName + '"');
+  const text = await res.text();
+  const start = text.indexOf('{');
+  const end = text.lastIndexOf('}');
+  if (start === -1 || end === -1) throw new Error('Unexpected response for sheet "' + sheetName + '"');
+  const json = JSON.parse(text.substring(start, end + 1));
+  if (json.status === 'error') throw new Error('Sheet "' + sheetName + '" not accessible — check link sharing is set to "Anyone with the link".');
+  return json.table.rows.map(r => (r.c || []).map(c => c ? (c.v !== undefined ? c.v : null) : null));
+}
+
+function showStatus(msg, isError){
+  const bar = document.getElementById('statusBar');
+  bar.textContent = msg;
+  bar.classList.add('show');
+  bar.style.background = isError ? '#fdecec' : '#fff4e6';
+  bar.style.borderColor = isError ? '#e8a8a8' : '#eac98a';
+  bar.style.color = isError ? '#9c2b2b' : '#8a5a15';
+}
+function hideStatus(){ document.getElementById('statusBar').classList.remove('show'); }
+
+async function loadAll(){
+  document.getElementById('loadingBar').style.display = 'block';
+  document.getElementById('dashboard').classList.remove('show');
+  hideStatus();
+  try{
+    const [dailyRows, sadqaRows] = await Promise.all([
+      fetchSheetRows('Daily'),
+      fetchSheetRows('Sadqa')
+    ]);
+    renderPrayerStats(dailyRows);
+    renderSadqa(sadqaRows);
+    document.getElementById('lastUpdated').textContent = 'Last refreshed ' + new Date().toLocaleString();
+    document.getElementById('dashboard').classList.add('show');
+  }catch(err){
+    console.error(err);
+    showStatus('Could not load live data: ' + err.message + ' — make sure the Google Sheet is shared as "Anyone with the link can view".', true);
+  }finally{
+    document.getElementById('loadingBar').style.display = 'none';
+  }
+}
+
+let dailyDayEntries = [];
+
+function renderPrayerStats(rows){
+  // rows: [Date, Fajr, Zuhr, Asr, Maghrib, Isha, Total Count]
+  const today = new Date(); today.setHours(0,0,0,0);
+  let startDate = null, lastDate = null;
+  dailyDayEntries = [];
+
+  rows.forEach(row => {
+    const d = parseGvizDate(row[0]);
+    if (!d) return;
+    if (!startDate || d < startDate) startDate = d;
+    if (d > today) return; // skip future template rows
+    lastDate = d;
+    const flags = {};
+    PRAYER_NAMES.forEach((p, i) => {
+      const v = row[i+1];
+      flags[p] = (v === 1 || v === '1' || v === true);
+    });
+    dailyDayEntries.push({ date: d, year: d.getFullYear(), flags });
+  });
+
+  document.getElementById('periodText').innerHTML =
+    `Tracking window<br><b>${startDate ? startDate.toLocaleDateString() : '—'} → ${lastDate ? lastDate.toLocaleDateString() : '—'}</b><br>${dailyDayEntries.length.toLocaleString()} days since start`;
+
+  // Hero + side-stats always reflect the full history
+  const totals = {Fajr:0, Zuhr:0, Asr:0, Maghrib:0, Isha:0};
+  dailyDayEntries.forEach(e => PRAYER_NAMES.forEach(p => { if (e.flags[p]) totals[p]++; }));
+  const trackedDays = dailyDayEntries.length;
+  const prayers = PRAYER_NAMES.map(name => ({
+    name, total: totals[name], pct: trackedDays ? (totals[name]/trackedDays*100) : 0
+  }));
+  const avg = prayers.reduce((s,p)=>s+p.pct,0)/prayers.length;
+  document.getElementById('heroPct').textContent = avg.toFixed(1)+'%';
+  const totalLoggedCount = prayers.reduce((s,p)=>s+p.total,0);
+  const totalPossible = trackedDays * PRAYER_NAMES.length;
+  document.getElementById('totalLogged').textContent = totalLoggedCount.toLocaleString();
+  document.getElementById('totalRemaining').textContent = (totalPossible-totalLoggedCount).toLocaleString();
+  const best = prayers.reduce((a,b)=>a.pct>b.pct?a:b);
+  document.getElementById('bestPrayer').textContent = best.name + ' · ' + best.pct.toFixed(1)+'%';
+
+  // Year filter (Prayer-wise Completion rings)
+  const years = [...new Set(dailyDayEntries.map(e=>e.year))].sort((a,b)=>b-a);
+  const filterEl = document.getElementById('prayerYearFilter');
+  const prevSelection = filterEl.value;
+  filterEl.innerHTML = '<option value="all">All Years</option>' + years.map(y=>`<option value="${y}">${y}</option>`).join('');
+  filterEl.value = years.includes(Number(prevSelection)) ? prevSelection : 'all';
+  renderRings(filterEl.value);
+
+  // Yearly Trend chart always shows every year
+  const byYear = {};
+  dailyDayEntries.forEach(e => {
+    if (!byYear[e.year]) byYear[e.year] = {Fajr:0,Zuhr:0,Asr:0,Maghrib:0,Isha:0};
+    PRAYER_NAMES.forEach(p => { if (e.flags[p]) byYear[e.year][p]++; });
+  });
+  const chartYears = years.slice().sort((a,b)=>a-b);
+  document.getElementById('yearRange').textContent = chartYears.length ? `${chartYears[0]} – ${chartYears[chartYears.length-1]}` : '';
+  const colors = {Fajr:'#0e3a35', Zuhr:'#155e51', Asr:'#4a8577', Maghrib:'#a9c2b3', Isha:'#c79a4b'};
+
+  if (yearlyChartInstance) yearlyChartInstance.destroy();
+  yearlyChartInstance = new Chart(document.getElementById('yearlyChart'), {
+    type:'bar',
+    data:{
+      labels: chartYears,
+      datasets: PRAYER_NAMES.map(p => ({
+        label: p, data: chartYears.map(y => byYear[y][p]), backgroundColor: colors[p], borderRadius:4, maxBarThickness:16
+      }))
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{ position:'bottom', labels:{ boxWidth:10, boxHeight:10, usePointStyle:true, font:{family:"'Work Sans'", size:12} } } },
+      scales:{
+        x:{ grid:{ display:false }, ticks:{ font:{family:"'Work Sans'", size:12} } },
+        y:{ grid:{ color:'rgba(14,58,53,0.06)' }, ticks:{ font:{family:"'Work Sans'", size:12} }, title:{ display:true, text:'Days prayed', font:{size:12} } }
+      }
+    }
+  });
+}
+
+function onPrayerYearChange(){
+  renderRings(document.getElementById('prayerYearFilter').value);
+}
+
+let perDayInputs = {};
+
+function renderRings(yearFilter){
+  const scoped = yearFilter === 'all' ? dailyDayEntries : dailyDayEntries.filter(e => String(e.year) === String(yearFilter));
+  const trackedDays = scoped.length;
+  const totals = {Fajr:0, Zuhr:0, Asr:0, Maghrib:0, Isha:0};
+  scoped.forEach(e => PRAYER_NAMES.forEach(p => { if (e.flags[p]) totals[p]++; }));
+  const prayers = PRAYER_NAMES.map(name => ({
+    name, total: totals[name], pct: trackedDays ? (totals[name]/trackedDays*100) : 0
+  }));
+
+  const ringsRow = document.getElementById('ringsRow');
+  ringsRow.innerHTML = '';
+  const R = 46, C = 2*Math.PI*R;
+  prayers.forEach(p=>{
+    const offset = C - (p.pct/100)*C;
+    const remaining = trackedDays - p.total;
+    const card = document.createElement('div');
+    card.className='ring-card';
+    card.innerHTML = `
+      <div class="name">${p.name}</div>
+      <svg viewBox="0 0 108 108">
+        <circle cx="54" cy="54" r="${R}" fill="none" stroke="#eef1ee" stroke-width="10"/>
+        <circle cx="54" cy="54" r="${R}" fill="none" stroke="url(#grad-${p.name})" stroke-width="10"
+          stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${offset}"
+          transform="rotate(-90 54 54)"/>
+        <defs>
+          <linearGradient id="grad-${p.name}" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#0e3a35"/><stop offset="100%" stop-color="#c79a4b"/>
+          </linearGradient>
+        </defs>
+        <text x="54" y="60" text-anchor="middle" class="ring-pct">${p.pct.toFixed(2)}%</text>
+      </svg>
+      <div class="counts">
+        <b>${p.total.toLocaleString()}</b> of ${trackedDays.toLocaleString()} days<br>
+        Remaining: <b>${remaining.toLocaleString()}</b>
+      </div>
+      <div class="perday-row">
+        <label for="perday-${p.name}">Per day</label>
+        <input type="number" min="1" step="1" class="perday-input" id="perday-${p.name}"
+          value="${perDayInputs[p.name] ?? ''}" placeholder="e.g. 2"
+          oninput="onPerDayChange('${p.name}', ${remaining})">
+        <span class="days-to-complete" id="daysLeft-${p.name}"></span>
+      </div>
+    `;
+    ringsRow.appendChild(card);
+    onPerDayChange(p.name, remaining);
+  });
+}
+
+function onPerDayChange(name, remaining){
+  const input = document.getElementById('perday-'+name);
+  const out = document.getElementById('daysLeft-'+name);
+  const val = parseFloat(input.value);
+  perDayInputs[name] = input.value;
+  if (!val || val <= 0){ out.textContent = ''; return; }
+  if (remaining <= 0){ out.textContent = 'Already complete'; return; }
+  const days = Math.ceil(remaining/val);
+  out.textContent = `≈ ${days.toLocaleString()} day${days>1?'s':''} to complete`;
+}
+
+let sadqaEntries = [];
+
+function renderSadqa(rows){
+  // rows: [Month, Salary, Sadaqah %, Planned Sadaqah, Payment Date, Notes, ...]
+  sadqaEntries = [];
+  rows.forEach(row => {
+    const monthDate = parseGvizDate(row[0]);
+    const salary = row[1];
+    if (!monthDate || typeof salary !== 'number') return;
+    sadqaEntries.push({
+      month: monthDate,
+      salary: salary,
+      rate: typeof row[2] === 'number' ? row[2] : null,
+      planned: typeof row[3] === 'number' ? row[3] : 0,
+      payDate: parseGvizDate(row[4])
+    });
+  });
+  sadqaEntries.sort((a,b)=>b.month-a.month);
+
+  const years = [...new Set(sadqaEntries.map(e=>e.month.getFullYear()))].sort((a,b)=>b-a);
+  const filterEl = document.getElementById('sadaqaYearFilter');
+  const prevSelection = filterEl.value;
+  filterEl.innerHTML = '<option value="all">All Years</option>' + years.map(y=>`<option value="${y}">${y}</option>`).join('');
+  filterEl.value = years.includes(Number(prevSelection)) ? prevSelection : 'all';
+  renderSadqaTable(filterEl.value);
+}
+
+function onSadqaYearChange(){
+  renderSadqaTable(document.getElementById('sadaqaYearFilter').value);
+}
+
+function renderSadqaTable(yearFilter){
+  const entries = yearFilter === 'all' ? sadqaEntries : sadqaEntries.filter(e => String(e.month.getFullYear()) === String(yearFilter));
+
+  const body = document.getElementById('sadaqaBody');
+  body.innerHTML = '';
+  entries.forEach(e=>{
+    const tr = document.createElement('tr');
+    const monthLabel = e.month.toLocaleDateString(undefined, {month:'long', year:'numeric'});
+    const rateLabel = e.rate !== null ? (e.rate*100).toFixed(2)+'%' : '—';
+    tr.innerHTML = `<td>${monthLabel}</td><td>Rs ${e.salary.toLocaleString()}</td><td><span class="tag">${rateLabel}</span></td><td>Rs ${e.planned.toLocaleString()}</td><td>${e.payDate ? e.payDate.toLocaleDateString() : '—'}</td>`;
+    body.appendChild(tr);
+  });
+
+  const totalPlanned = entries.reduce((s,e)=>s+e.planned,0);
+  const monthsCount = entries.length;
+  document.getElementById('sadaqaTotal').textContent = 'Rs ' + totalPlanned.toLocaleString();
+  document.getElementById('sadaqaFoot').textContent = monthsCount ? `Across ${monthsCount} month${monthsCount>1?'s':''}` : 'No entries yet';
+
+  const ratedEntries = entries.filter(e => e.rate !== null);
+  const avgRate = ratedEntries.length ? ratedEntries.reduce((s,e)=>s+e.rate,0)/ratedEntries.length : 0;
+  const avgSalary = monthsCount ? entries.reduce((s,e)=>s+e.salary,0)/monthsCount : 0;
+  const totalSalary = avgSalary * 12;
+  const annual = totalSalary * avgRate;
+  document.getElementById('sadaqaAnnual').textContent = 'Rs ' + Math.round(annual).toLocaleString();
+  document.getElementById('sadaqaRange').textContent = entries.length ? `${entries[entries.length-1].month.toLocaleDateString(undefined,{month:'short',year:'numeric'})} – ${entries[0].month.toLocaleDateString(undefined,{month:'short',year:'numeric'})}` : '';
+}
+
+loadAll();
+</script>
+</body>
+</html>
