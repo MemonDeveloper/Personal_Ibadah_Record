@@ -169,14 +169,15 @@
   .daily-summary h3{ font-family:var(--font-heading); font-size:20px; color:var(--emerald); margin-bottom:10px; }
   .daily-summary .summary-meta{ font-size:13px; color:var(--muted); margin-bottom:14px; }
   .daily-summary .summary-top{ display:flex; justify-content:space-between; align-items:flex-start; gap:16px; flex-wrap:wrap; margin-bottom:14px; }
-  .daily-summary .summary-controls{ display:flex; flex-wrap:wrap; gap:10px; margin-bottom:12px; }
-  .daily-summary .filter-select{ border:1px solid rgba(31,77,67,0.18); background:#fff; color:var(--emerald); border-radius:999px; padding:8px 12px; font-size:12px; font-weight:700; cursor:pointer; box-shadow:0 8px 16px rgba(31,77,67,0.06); }
+  .daily-summary .summary-controls{ display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-bottom:12px; }
+  .daily-summary .filter-select, .daily-summary .date-picker-trigger{ width:140px; min-height:40px; border:1px solid rgba(31,77,67,0.18); background:#fff; color:var(--emerald); border-radius:999px; padding:8px 12px; font-size:12px; font-weight:700; cursor:pointer; box-shadow:0 8px 16px rgba(31,77,67,0.06); display:inline-flex; align-items:center; justify-content:center; }
+  .daily-summary .filter-select:hover, .daily-summary .date-picker-trigger:hover{ border-color:rgba(0,163,108,0.3); }
   .daily-summary .progress-row{ display:flex; align-items:center; gap:10px; margin-bottom:12px; font-weight:600; color:var(--emerald); }
   .daily-summary .progress-pill{ display:inline-flex; align-items:center; justify-content:center; min-width:54px; padding:6px 10px; border-radius:999px; background:rgba(31,77,67,0.1); color:var(--emerald); font-size:13px; }
   .daily-summary .date-picker{ position:relative; margin-bottom:12px; }
   .daily-summary .date-picker-trigger{ display:inline-flex; align-items:center; gap:8px; border:1px solid rgba(31,77,67,0.18); background:#fff; color:var(--emerald); border-radius:999px; padding:8px 12px; font-size:12px; font-weight:700; cursor:pointer; box-shadow:0 8px 16px rgba(31,77,67,0.06); }
   .daily-summary .date-picker-trigger:hover{ border-color:rgba(0,163,108,0.3); }
-  .daily-summary .calendar-popup{ position:absolute; top:calc(100% + 8px); left:0; z-index:10; width:min(320px, 100%); padding:14px; border-radius:18px; background:#fffdf9; border:1px solid rgba(31,77,67,0.14); box-shadow:0 18px 40px rgba(31,77,67,0.12); }
+  .daily-summary .calendar-popup{ position:absolute; top:calc(100% + 8px); left:0; z-index:10; width:min(320px, 100%); padding:14px; border-radius:18px; background:rgba(255,253,249,0.98); border:1px solid rgba(31,77,67,0.16); box-shadow:0 18px 40px rgba(31,77,67,0.15); backdrop-filter:blur(10px); }
   .daily-summary .calendar-controls{ display:flex; gap:8px; margin-bottom:10px; }
   .daily-summary .calendar-controls select{ flex:1; border:1px solid rgba(31,77,67,0.14); border-radius:10px; padding:7px 8px; font-size:12px; color:var(--emerald); background:#fff; }
   .daily-summary .calendar-weekdays, .daily-summary .calendar-days{ display:grid; grid-template-columns:repeat(7, 1fr); gap:6px; }
