@@ -165,6 +165,15 @@
   .days-to-complete{ min-height:16px; font-size:12px; color:var(--gold); font-weight:600; }
 
   .panel{ background:rgba(255,255,255,0.74); border:1px solid var(--line); border-radius:24px; padding:22px 22px 18px; box-shadow:0 10px 28px rgba(31,77,67,0.06); }
+  .daily-summary{ margin-bottom:24px; padding:22px 24px; border-radius:24px; background:linear-gradient(135deg, rgba(255,255,255,0.88), rgba(248,243,234,0.95)); border:1px solid rgba(184,138,59,0.22); box-shadow:0 12px 30px rgba(31,77,67,0.08); }
+  .daily-summary h3{ font-family:var(--font-heading); font-size:20px; color:var(--emerald); margin-bottom:10px; }
+  .daily-summary .summary-meta{ font-size:13px; color:var(--muted); margin-bottom:14px; }
+  .daily-summary .progress-row{ display:flex; align-items:center; gap:10px; margin-bottom:12px; font-weight:600; color:var(--emerald); }
+  .daily-summary .progress-pill{ display:inline-flex; align-items:center; justify-content:center; min-width:54px; padding:6px 10px; border-radius:999px; background:rgba(31,77,67,0.1); color:var(--emerald); font-size:13px; }
+  .daily-summary .prayer-list{ display:grid; grid-template-columns:repeat(auto-fit, minmax(120px, 1fr)); gap:10px; margin-top:8px; }
+  .daily-summary .prayer-item{ padding:10px 12px; border-radius:14px; background:rgba(255,255,255,0.72); border:1px solid rgba(31,77,67,0.1); font-size:13px; color:var(--text); }
+  .daily-summary .prayer-item.done{ background:rgba(144,238,144,0.22); border-color:rgba(0,163,108,0.25); color:#0f6b4a; font-weight:600; }
+  .daily-summary .prayer-item.pending{ background:rgba(255,255,255,0.72); color:var(--muted); }
   .chart-wrap{ height:320px; }
 
   .sadaqah-grid{ display:grid; grid-template-columns:1.3fr .7fr; gap:22px; }
@@ -243,6 +252,13 @@
         </div>
       </div>
 
+      <div class="daily-summary">
+        <h3>Daily Summary</h3>
+        <div class="summary-meta">Date: <strong id="todayDate">Today</strong></div>
+        <div class="progress-row">Prayer Progress: <span class="progress-pill" id="dailyProgress">0 / 5</span></div>
+        <div class="prayer-list" id="dailyPrayerList"></div>
+      </div>
+
       <div class="section-title"><span class="section-icon">☼</span><h2>Prayer Overview</h2><span class="section-kicker">% of tracked days</span><select class="year-filter" id="prayerYearFilter" onchange="onPrayerYearChange()"></select></div>
       <div class="prayer-grid" id="ringsRow"></div>
 
@@ -269,7 +285,7 @@
             <div class="v" id="sadaqaTotal">Rs —</div>
             <div class="foot" id="sadaqaFoot">—</div>
           </div>
-          <div class="mini-stat"><span class="l">Projected annual sadaqah</span><span class="v" id="sadaqaAnnual">Rs —</span></div>
+          <div class="mini-stat"><span class="l">Annual sadaqah</span><span class="v" id="sadaqaAnnual">Rs —</span></div>
         </div>
       </div>
     </div>
@@ -377,6 +393,20 @@ function renderPrayerStats(rows){
   const avg = prayers.reduce((s,p)=>s+p.pct,0)/prayers.length;
   document.getElementById('heroPct').textContent = avg.toFixed(1)+'%';
   const totalLoggedCount = prayers.reduce((s,p)=>s+p.total,0);
+  const todayLabel = new Date().toLocaleDateString(undefined, {weekday:'short', year:'numeric', month:'short', day:'numeric'});
+  document.getElementById('todayDate').textContent = todayLabel;
+  const todayRow = dailyDayEntries[dailyDayEntries.length - 1];
+  const todayCount = todayRow ? PRAYER_NAMES.filter(p => todayRow.flags[p]).length : 0;
+  document.getElementById('dailyProgress').textContent = `${todayCount} / ${PRAYER_NAMES.length}`;
+  const dailyList = document.getElementById('dailyPrayerList');
+  dailyList.innerHTML = '';
+  PRAYER_NAMES.forEach(prayer => {
+    const item = document.createElement('div');
+    const done = todayRow ? todayRow.flags[prayer] : false;
+    item.className = `prayer-item ${done ? 'done' : 'pending'}`;
+    item.textContent = done ? `✓ ${prayer}` : `○ ${prayer}`;
+    dailyList.appendChild(item);
+  });
   const totalPossible = trackedDays * PRAYER_NAMES.length;
   const loggedPct = totalPossible ? (totalLoggedCount / totalPossible) * 100 : 0;
   const remainingPct = totalPossible ? ((totalPossible - totalLoggedCount) / totalPossible) * 100 : 0;
