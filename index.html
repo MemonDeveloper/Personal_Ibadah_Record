@@ -547,7 +547,6 @@ function renderPrayerStats(rows){
   document.getElementById('bestPrayer').textContent = best.name + ' · ' + best.pct.toFixed(1)+'%';
 
   // Year filter (Prayer-wise Completion rings)
-  const years = [...new Set(dailyDayEntries.map(e=>e.year))].sort((a,b)=>b-a);
   const filterEl = document.getElementById('prayerYearFilter');
   const prevSelection = filterEl.value;
   filterEl.innerHTML = '<option value="all">All Years</option>' + years.map(y=>`<option value="${y}">${y}</option>`).join('');
