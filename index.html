@@ -436,13 +436,13 @@ function renderSadqaTable(yearFilter){
     const tr = document.createElement('tr');
     const monthLabel = e.month.toLocaleDateString(undefined, {month:'long', year:'numeric'});
     const rateLabel = e.rate !== null ? (e.rate*100).toFixed(2)+'%' : '—';
-    tr.innerHTML = `<td>${monthLabel}</td><td>Rs ${e.salary.toLocaleString()}</td><td><span class="tag">${rateLabel}</span></td><td>Rs ${e.planned.toLocaleString()}</td><td>${e.payDate ? e.payDate.toLocaleDateString() : '—'}</td>`;
+    tr.innerHTML = `<td>${monthLabel}</td><td>Rs ${Math.round(e.salary).toLocaleString()}</td><td><span class="tag">${rateLabel}</span></td><td>Rs ${Math.round(e.planned).toLocaleString()}</td><td>${e.payDate ? e.payDate.toLocaleDateString() : '—'}</td>`;
     body.appendChild(tr);
   });
 
   const totalPlanned = entries.reduce((s,e)=>s+e.planned,0);
   const monthsCount = entries.length;
-  document.getElementById('sadaqaTotal').textContent = 'Rs ' + totalPlanned.toLocaleString();
+  document.getElementById('sadaqaTotal').textContent = 'Rs ' + Math.round(totalPlanned).toLocaleString();
   document.getElementById('sadaqaFoot').textContent = monthsCount ? `Across ${monthsCount} month${monthsCount>1?'s':''}` : 'No entries yet';
 
   const ratedEntries = entries.filter(e => e.rate !== null);
