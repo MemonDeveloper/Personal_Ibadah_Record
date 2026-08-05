@@ -131,25 +131,26 @@
   .section-kicker{ font-size:12px; color:var(--muted); letter-spacing:.16em; text-transform:uppercase; }
   .year-filter{ margin-left:auto; font-family:var(--font-body); font-size:12px; font-weight:600; color:var(--emerald); background:rgba(255,255,255,0.8); border:1px solid var(--line); border-radius:999px; padding:7px 12px; cursor:pointer; }
 
-  .prayer-grid{ display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:18px; }
-  @media(max-width:900px){ .prayer-grid{ grid-template-columns:1fr; } }
-  .prayer-card{ position:relative; padding:22px 20px 20px; border:1px solid rgba(184,138,59,0.35); border-radius:24px; background:var(--cream); box-shadow:0 10px 26px rgba(31,77,67,0.06); transition:transform .3s ease, box-shadow .3s ease, border-color .3s ease; overflow:hidden; }
-  .prayer-card:hover{ transform:translateY(-4px); box-shadow:0 16px 30px rgba(31,77,67,0.12); border-color:rgba(184,138,59,0.6); }
-  .prayer-card::before{ content:""; position:absolute; left:-20px; top:-20px; width:120px; height:120px; border-radius:50%; border:1px solid rgba(184,138,59,0.16); }
-  .prayer-badge{ position:absolute; top:16px; right:16px; width:44px; height:44px; display:grid; place-items:center; border-radius:50%; background:linear-gradient(135deg, var(--gold), #d8b46c); color:#fff; font-family:var(--font-heading); font-size:16px; font-weight:700; box-shadow:0 8px 16px rgba(184,138,59,0.22); }
-  .prayer-head{ display:flex; justify-content:space-between; align-items:flex-start; gap:12px; margin-bottom:10px; }
-  .prayer-head h3{ font-family:var(--font-heading); font-size:20px; color:var(--emerald); font-weight:700; margin-bottom:3px; }
-  .prayer-subtitle{ font-size:12px; color:var(--muted); text-transform:uppercase; letter-spacing:.16em; }
-  .prayer-score{ font-family:var(--font-heading); font-size:22px; color:var(--gold); font-weight:700; }
-  .prayer-ring-wrap{ display:flex; justify-content:center; margin:8px 0 14px; }
-  .prayer-ring{ width:108px; height:108px; }
-  .ring-pct{ font-family:var(--font-heading); font-size:20px; fill:var(--emerald); font-weight:700; }
-  .prayer-rakats{ list-style:none; display:grid; gap:7px; margin:0 0 14px; }
-  .prayer-rakats li{ position:relative; padding-left:15px; font-size:13px; color:var(--text); }
-  .prayer-rakats li::before{ content:"•"; position:absolute; left:0; color:var(--gold); }
-  .prayer-meta{ display:flex; justify-content:space-between; gap:10px; font-size:12px; color:var(--muted); margin-bottom:12px; }
-  .prayer-meta span{ color:var(--emerald); font-weight:700; }
-  .perday-row{ padding-top:12px; border-top:1px dashed rgba(184,138,59,0.32); display:flex; flex-direction:column; align-items:flex-start; gap:6px; }
+  .prayer-grid{ display:grid; grid-template-columns:repeat(auto-fit, minmax(190px, 1fr)); gap:18px; }
+  @media(max-width:900px){ .prayer-grid{ grid-template-columns:repeat(2, minmax(0, 1fr)); } }
+  @media(max-width:640px){ .prayer-grid{ grid-template-columns:1fr; } }
+  .prayer-card{ position:relative; display:flex; flex-direction:column; min-height:300px; padding:0; border:0; border-radius:24px; overflow:hidden; box-shadow:0 16px 34px rgba(31,77,67,0.12); transition:transform .3s ease, box-shadow .3s ease; }
+  .prayer-card:hover{ transform:translateY(-4px); box-shadow:0 22px 38px rgba(31,77,67,0.16); }
+  .prayer-card--fajr{ background:linear-gradient(180deg, #1a2a6c 0%, #b21f1f 60%, #fdbb2d 100%); }
+  .prayer-card--zuhr{ background:linear-gradient(180deg, #2980b9 0%, #6dd5fa 60%, #ffffff 100%); }
+  .prayer-card--asr{ background:linear-gradient(180deg, #e65c00 0%, #f9d423 100%); }
+  .prayer-card--maghrib{ background:linear-gradient(180deg, #2c3e50 0%, #fd746c 50%, #ff9068 100%); }
+  .prayer-card--isha{ background:linear-gradient(180deg, #0f2027 0%, #203a43 50%, #2c5364 100%); }
+  .prayer-visual{ position:relative; min-height:164px; padding:14px 14px 0; }
+  .prayer-visual svg{ width:100%; height:100%; display:block; }
+  .prayer-card-body{ padding:14px 16px 16px; background:rgba(248,243,234,0.9); display:flex; flex-direction:column; gap:10px; flex:1; }
+  .prayer-card-header{ display:flex; justify-content:space-between; align-items:flex-start; gap:8px; }
+  .prayer-card-title{ font-family:var(--font-heading); font-size:20px; color:var(--emerald); font-weight:700; }
+  .prayer-card-subtitle{ font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.18em; margin-top:3px; }
+  .prayer-badge{ min-width:48px; height:48px; padding:0 8px; border-radius:999px; display:grid; place-items:center; background:rgba(31,77,67,0.95); color:#fff; font-family:var(--font-heading); font-size:16px; font-weight:700; box-shadow:inset 0 0 0 1px rgba(255,255,255,0.18); }
+  .prayer-summary{ display:flex; justify-content:space-between; gap:8px; font-size:12px; color:var(--muted); }
+  .prayer-summary span{ color:var(--emerald); font-weight:700; }
+  .perday-row{ padding-top:10px; border-top:1px solid rgba(31,77,67,0.08); display:flex; flex-direction:column; align-items:flex-start; gap:6px; }
   .perday-row label{ font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:var(--muted); }
   .perday-input{ width:72px; border:1px solid rgba(31,77,67,0.16); border-radius:999px; background:#fffdf9; padding:6px 10px; font-family:var(--font-body); font-size:13px; color:var(--emerald); }
   .perday-input:focus{ outline:none; border-color:rgba(184,138,59,0.5); }
@@ -419,58 +420,130 @@ function onPrayerYearChange(){
 
 let perDayInputs = {};
 
+function buildPrayerIllustration(name){
+  const visuals = {
+    Fajr: `<svg viewBox="0 0 260 180" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="fajr-bg" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#1a2a6c"/>
+          <stop offset="60%" stop-color="#b21f1f"/>
+          <stop offset="100%" stop-color="#fdbb2d"/>
+        </linearGradient>
+      </defs>
+      <rect width="260" height="180" rx="22" fill="url(#fajr-bg)"/>
+      <line x1="0" y1="128" x2="260" y2="128" stroke="rgba(255,255,255,0.25)" stroke-width="2"/>
+      <circle cx="130" cy="128" r="28" fill="#fff5cc" opacity="0.95"/>
+      <circle cx="130" cy="128" r="38" fill="#fff5cc" opacity="0.28"/>
+      <text x="130" y="48" text-anchor="middle" fill="#ffffff" font-family="Segoe UI, Roboto, sans-serif" font-size="18" font-weight="700">FAJR</text>
+      <text x="130" y="72" text-anchor="middle" fill="rgba(255,255,255,0.9)" font-family="Segoe UI, Roboto, sans-serif" font-size="12">Subah Sadiq</text>
+      <text x="130" y="152" text-anchor="middle" fill="rgba(255,255,255,0.95)" font-family="Segoe UI, Roboto, sans-serif" font-size="13" font-weight="700">Dawn</text>
+    </svg>`,
+    Zuhr: `<svg viewBox="0 0 260 180" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="zuhr-bg" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#2980b9"/>
+          <stop offset="60%" stop-color="#6dd5fa"/>
+          <stop offset="100%" stop-color="#ffffff"/>
+        </linearGradient>
+      </defs>
+      <rect width="260" height="180" rx="22" fill="url(#zuhr-bg)"/>
+      <circle cx="130" cy="86" r="30" fill="#fffae6"/>
+      <circle cx="130" cy="86" r="20" fill="#fff" opacity="0.45"/>
+      <path d="M130 46L130 36 M130 136L130 146 M88 86L78 86 M182 86L192 86 M100 60L94 54 M160 118L166 124 M100 112L94 118 M160 60L166 54" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"/>
+      <text x="130" y="48" text-anchor="middle" fill="#1a2a6c" font-family="Segoe UI, Roboto, sans-serif" font-size="18" font-weight="700">ZUHR</text>
+      <text x="130" y="72" text-anchor="middle" fill="#2c3e50" font-family="Segoe UI, Roboto, sans-serif" font-size="12">Zawal Ke Baad</text>
+      <text x="130" y="152" text-anchor="middle" fill="#1a2a6c" font-family="Segoe UI, Roboto, sans-serif" font-size="13" font-weight="700">Noon</text>
+    </svg>`,
+    Asr: `<svg viewBox="0 0 260 180" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="asr-bg" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#e65c00"/>
+          <stop offset="100%" stop-color="#f9d423"/>
+        </linearGradient>
+      </defs>
+      <rect width="260" height="180" rx="22" fill="url(#asr-bg)"/>
+      <line x1="0" y1="132" x2="260" y2="132" stroke="rgba(255,255,255,0.3)" stroke-width="2"/>
+      <circle cx="130" cy="110" r="26" fill="#fff" opacity="0.95"/>
+      <text x="130" y="48" text-anchor="middle" fill="#ffffff" font-family="Segoe UI, Roboto, sans-serif" font-size="18" font-weight="700">ASR</text>
+      <text x="130" y="72" text-anchor="middle" fill="rgba(255,255,255,0.9)" font-family="Segoe UI, Roboto, sans-serif" font-size="12">Seh-Pahar</text>
+      <text x="130" y="152" text-anchor="middle" fill="rgba(255,255,255,0.95)" font-family="Segoe UI, Roboto, sans-serif" font-size="13" font-weight="700">Afternoon</text>
+    </svg>`,
+    Maghrib: `<svg viewBox="0 0 260 180" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="maghrib-bg" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#2c3e50"/>
+          <stop offset="50%" stop-color="#fd746c"/>
+          <stop offset="100%" stop-color="#ff9068"/>
+        </linearGradient>
+      </defs>
+      <rect width="260" height="180" rx="22" fill="url(#maghrib-bg)"/>
+      <path d="M0 128Q65 122 130 128T260 128L260 180L0 180Z" fill="rgba(0,0,0,0.16)"/>
+      <path d="M84 128A26 26 0 0 1 136 128Z" fill="#ffcc00"/>
+      <path d="M145 92A14 14 0 1 0 158 105A12 12 0 1 1 145 92Z" fill="#ffffff" opacity="0.8"/>
+      <text x="130" y="48" text-anchor="middle" fill="#ffffff" font-family="Segoe UI, Roboto, sans-serif" font-size="18" font-weight="700">MAGHRIB</text>
+      <text x="130" y="72" text-anchor="middle" fill="rgba(255,255,255,0.9)" font-family="Segoe UI, Roboto, sans-serif" font-size="12">Gurub-e-Aftab</text>
+      <text x="130" y="152" text-anchor="middle" fill="rgba(255,255,255,0.95)" font-family="Segoe UI, Roboto, sans-serif" font-size="13" font-weight="700">Sunset</text>
+    </svg>`,
+    Isha: `<svg viewBox="0 0 260 180" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="isha-bg" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#0f2027"/>
+          <stop offset="50%" stop-color="#203a43"/>
+          <stop offset="100%" stop-color="#2c5364"/>
+        </linearGradient>
+      </defs>
+      <rect width="260" height="180" rx="22" fill="url(#isha-bg)"/>
+      <circle cx="44" cy="70" r="1.6" fill="#fff" opacity="0.95"/>
+      <circle cx="204" cy="56" r="2" fill="#fff" opacity="0.8"/>
+      <circle cx="70" cy="122" r="1.2" fill="#fff" opacity="0.7"/>
+      <circle cx="188" cy="132" r="1.6" fill="#fff" opacity="0.7"/>
+      <circle cx="126" cy="54" r="1.1" fill="#fff" opacity="1"/>
+      <path d="M112 100A22 22 0 1 0 134 122A18 18 0 1 1 112 100Z" fill="#fff5cc"/>
+      <text x="130" y="48" text-anchor="middle" fill="#ffffff" font-family="Segoe UI, Roboto, sans-serif" font-size="18" font-weight="700">ISHA</text>
+      <text x="130" y="72" text-anchor="middle" fill="rgba(255,255,255,0.9)" font-family="Segoe UI, Roboto, sans-serif" font-size="12">Raat Ka Waqt</text>
+      <text x="130" y="152" text-anchor="middle" fill="rgba(255,255,255,0.95)" font-family="Segoe UI, Roboto, sans-serif" font-size="13" font-weight="700">Night</text>
+    </svg>`
+  };
+  return visuals[name] || visuals.Fajr;
+}
+
 function renderRings(yearFilter){
   const scoped = yearFilter === 'all' ? dailyDayEntries : dailyDayEntries.filter(e => String(e.year) === String(yearFilter));
   const trackedDays = scoped.length;
   const totals = {Fajr:0, Zuhr:0, Asr:0, Maghrib:0, Isha:0};
   scoped.forEach(e => PRAYER_NAMES.forEach(p => { if (e.flags[p]) totals[p]++; }));
   const prayers = PRAYER_NAMES.map(name => ({
-    name, total: totals[name], pct: trackedDays ? (totals[name]/trackedDays*100) : 0,
-    rakats: name === 'Fajr' ? ['2 Sunnah', '2 Fard'] : name === 'Zuhr' ? ['4 Sunnah', '4 Fard', '2 Sunnah'] : name === 'Asr' ? ['4 Fard'] : name === 'Maghrib' ? ['3 Fard', '2 Sunnah'] : ['4 Sunnah', '2 Fard', '1 Witr']
+    name, total: totals[name], pct: trackedDays ? (totals[name]/trackedDays*100) : 0
   }));
 
   const ringsRow = document.getElementById('ringsRow');
   ringsRow.innerHTML = '';
-  const R = 42, C = 2*Math.PI*R;
+  const subtitleMap = { Fajr:'Subah Sadiq', Zuhr:'Zawal Ke Baad', Asr:'Seh-Pahar', Maghrib:'Gurub-e-Aftab', Isha:'Raat Ka Waqt' };
   prayers.forEach((p, index)=>{
-    const offset = C - (p.pct/100)*C;
     const remaining = trackedDays - p.total;
     const card = document.createElement('article');
-    card.className='prayer-card';
+    card.className=`prayer-card prayer-card--${p.name.toLowerCase()}`;
     card.innerHTML = `
-      <div class="prayer-badge">${index + 1}</div>
-      <div class="prayer-head">
-        <div>
-          <h3>${p.name}</h3>
-          <div class="prayer-subtitle">Daily Prayer</div>
+      <div class="prayer-visual">
+        ${buildPrayerIllustration(p.name)}
+      </div>
+      <div class="prayer-card-body">
+        <div class="prayer-card-header">
+          <div>
+            <div class="prayer-card-title">${p.name}</div>
+            <div class="prayer-card-subtitle">${subtitleMap[p.name]}</div>
+          </div>
+          <div class="prayer-badge">${p.pct.toFixed(0)}%</div>
         </div>
-        <div class="prayer-score">${p.pct.toFixed(0)}%</div>
-      </div>
-      <div class="prayer-ring-wrap">
-        <svg class="prayer-ring" viewBox="0 0 108 108">
-          <circle cx="54" cy="54" r="${R}" fill="none" stroke="#efe4cf" stroke-width="10"/>
-          <circle cx="54" cy="54" r="${R}" fill="none" stroke="url(#grad-${p.name})" stroke-width="10"
-            stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${offset}"
-            transform="rotate(-90 54 54)"/>
-          <defs>
-            <linearGradient id="grad-${p.name}" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" stop-color="#1F4D43"/><stop offset="100%" stop-color="#B88A3B"/>
-            </linearGradient>
-          </defs>
-          <text x="54" y="60" text-anchor="middle" class="ring-pct">${p.pct.toFixed(1)}%</text>
-        </svg>
-      </div>
-      <ul class="prayer-rakats">
-        ${p.rakats.map(r => `<li>${r}</li>`).join('')}
-      </ul>
-      <div class="prayer-meta">
-        <div>Completed <span>${p.total.toLocaleString()}</span></div>
-        <div>Remaining <span>${remaining.toLocaleString()}</span></div>
-      </div>
-      <div class="perday-row">
-        <label for="perday-${p.name}">Per Day</label>
-        <input type="number" min="1" step="1" class="perday-input" id="perday-${p.name}" value="${perDayInputs[p.name] ?? ''}" placeholder="2" oninput="onPerDayChange('${p.name}', ${remaining})">
-        <span class="days-to-complete" id="daysLeft-${p.name}"></span>
+        <div class="prayer-summary">
+          <div>Completed <span>${p.total.toLocaleString()}</span></div>
+          <div>Left <span>${remaining.toLocaleString()}</span></div>
+        </div>
+        <div class="perday-row">
+          <label for="perday-${p.name}">Per Day</label>
+          <input type="number" min="1" step="1" class="perday-input" id="perday-${p.name}" value="${perDayInputs[p.name] ?? ''}" placeholder="2" oninput="onPerDayChange('${p.name}', ${remaining})">
+          <span class="days-to-complete" id="daysLeft-${p.name}"></span>
+        </div>
       </div>
     `;
     ringsRow.appendChild(card);
