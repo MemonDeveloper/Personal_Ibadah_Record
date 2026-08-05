@@ -5,190 +5,272 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Salah &amp; Sadaqah Dashboard</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Work+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<meta name="description" content="A refined Islamic Salah chart dashboard with elegant, minimal styling and live prayer tracking.">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.5.0/chart.umd.min.js"></script>
 <style>
   :root{
-    --font-sans:'Work Sans','Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
-    --font-serif:'Amiri','Noto Serif','Times New Roman',Georgia,serif;
-    --ink:#16241f; --cream:#faf6ee; --panel:#ffffff;
-    --teal:#0e3a35; --teal-2:#155e51; --gold:#c79a4b; --gold-soft:#e6c98a;
-    --line: rgba(14,58,53,0.10); --shadow: 0 10px 30px rgba(14,58,53,0.08);
+    --font-heading:'Cinzel','Cormorant Garamond','Times New Roman',serif;
+    --font-body:'Poppins','Inter','Segoe UI',sans-serif;
+    --cream:#F8F3EA;
+    --cream-deep:#efe4cf;
+    --emerald:#1F4D43;
+    --emerald-deep:#14332D;
+    --gold:#B88A3B;
+    --gold-soft:#E7C87A;
+    --text:#2C3A33;
+    --muted:#6f7b75;
+    --line:rgba(31,77,67,0.14);
+    --shadow:0 18px 50px rgba(31,77,67,0.12);
   }
   *{box-sizing:border-box; margin:0; padding:0;}
   body{
+    margin:0;
+    min-height:100vh;
+    padding:24px 18px 48px;
+    font-family:var(--font-body);
+    color:var(--text);
     background:
-      radial-gradient(circle at 15% -10%, rgba(199,154,75,0.10), transparent 40%),
-      radial-gradient(circle at 100% 0%, rgba(14,58,53,0.06), transparent 45%),
+      radial-gradient(circle at 10% 0%, rgba(184,138,59,0.16), transparent 24%),
+      radial-gradient(circle at 100% 0%, rgba(31,77,67,0.08), transparent 28%),
       var(--cream);
-    color:var(--ink); font-family:var(--font-sans);
-    -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
-    padding: 48px 6vw 80px; min-height:100vh;
+    -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility; overflow-x:hidden;
+    position:relative;
   }
-  .wrap{ max-width:1180px; margin:0 auto; }
+  body::before{
+    content:"";
+    position:fixed; inset:0;
+    background-image:
+      linear-gradient(120deg, rgba(31,77,67,0.035) 0%, rgba(31,77,67,0.035) 25%, transparent 25%, transparent 75%, rgba(184,138,59,0.04) 75%, rgba(184,138,59,0.04) 100%);
+    background-size:180px 180px;
+    opacity:.45;
+    pointer-events:none;
+    mix-blend-mode:multiply;
+  }
+  .wrap{ max-width:1160px; margin:0 auto; position:relative; }
+  .page-shell{
+    position:relative;
+    background:rgba(255,255,255,0.5);
+    border:1px solid rgba(184,138,59,0.24);
+    border-radius:44px 44px 34px 34px;
+    box-shadow:var(--shadow);
+    padding:34px clamp(18px,3vw,42px) 36px;
+    overflow:hidden;
+    backdrop-filter:blur(8px);
+  }
+  .page-shell::before{
+    content:"";
+    position:absolute; inset:0 0 auto 0;
+    height:120px;
+    background:linear-gradient(180deg, rgba(184,138,59,0.08), transparent);
+    border-radius:44px 44px 0 0;
+    pointer-events:none;
+  }
+  .page-shell::after{
+    content:"";
+    position:absolute; top:-82px; left:50%; width:72%; height:120px;
+    transform:translateX(-50%);
+    border:2px solid rgba(184,138,59,0.22);
+    border-top:0; border-left:0; border-right:0;
+    border-radius:0 0 50% 50%;
+    pointer-events:none;
+  }
 
-  header{
-    display:flex; justify-content:space-between; align-items:flex-end; gap:24px;
-    margin-bottom:44px; flex-wrap:wrap; border-bottom:1px solid var(--line); padding-bottom:28px;
-  }
-  .eyebrow{ font-size:12.5px; letter-spacing:.22em; text-transform:uppercase; color:var(--teal-2); font-weight:600; margin-bottom:10px; opacity:.85; }
-  h1{ font-family:var(--font-serif); font-weight:700; font-size:clamp(32px,4.2vw,52px); color:var(--teal); line-height:1.05; }
-  .period{ text-align:right; font-size:14px; color:var(--ink); opacity:.65; line-height:1.6; min-width:220px; }
-  .period b{ color:var(--teal); font-weight:600; opacity:1; }
+  .page-header{ text-align:center; padding:8px 0 18px; position:relative; z-index:1; }
+  .header-ornaments{ display:flex; justify-content:center; gap:18px; margin-bottom:10px; }
+  .decor-icon{ width:42px; height:42px; animation:floatIcon 4.8s ease-in-out infinite; }
+  .decor-icon.delay-2{ animation-delay:1.2s; }
+  .decor-icon.delay-3{ animation-delay:2.2s; }
+  .eyebrow{ font-size:11px; letter-spacing:.34em; text-transform:uppercase; color:var(--gold); font-weight:700; margin-bottom:10px; }
+  h1{ font-family:var(--font-heading); font-size:clamp(32px,4.4vw,54px); line-height:1.1; color:var(--emerald); font-weight:700; letter-spacing:.02em; }
+  .subtitle{ margin-top:10px; font-size:13px; line-height:1.5; letter-spacing:.32em; text-transform:uppercase; color:var(--gold); font-weight:600; }
+
+  .meta-bar{ display:flex; justify-content:space-between; align-items:center; gap:16px; flex-wrap:wrap; margin:22px 0 18px; padding:16px 0 20px; border-top:1px solid var(--line); border-bottom:1px solid var(--line); }
+  .period{ font-size:14px; line-height:1.6; color:var(--muted); }
+  .period b{ color:var(--emerald); font-weight:700; }
   .refresh-btn{
-    margin-top:10px; font-size:12px; letter-spacing:.05em; text-transform:uppercase;
-    background:none; border:1px solid var(--line); color:var(--teal-2); padding:6px 14px;
-    border-radius:20px; cursor:pointer; font-family:var(--font-sans); font-weight:600;
-    transition:.2s;
+    border:1px solid rgba(184,138,59,0.45); background:linear-gradient(135deg, var(--emerald), var(--emerald-deep));
+    color:#fff; padding:10px 16px; border-radius:999px; font-family:var(--font-body); font-size:12px; letter-spacing:.16em; text-transform:uppercase; font-weight:600; cursor:pointer; transition:transform .25s ease, box-shadow .25s ease;
+    box-shadow:0 10px 24px rgba(31,77,67,0.16);
   }
-  .refresh-btn:hover{ background:var(--teal); color:#fff; border-color:var(--teal); }
+  .refresh-btn:hover{ transform:translateY(-1px); box-shadow:0 12px 24px rgba(184,138,59,0.22); }
 
-  #statusBar{
-    display:none; background:#fff4e6; border:1px solid #eac98a; color:#8a5a15;
-    padding:14px 18px; border-radius:12px; font-size:13.5px; margin-bottom:28px;
-  }
+  #statusBar{ display:none; padding:14px 16px; border-radius:16px; background:rgba(255,243,214,0.8); border:1px solid rgba(184,138,59,0.28); color:#7d5318; font-size:13px; margin-bottom:20px; }
   #statusBar.show{ display:block; }
-  #loadingBar{
-    text-align:center; padding:60px 0; color:var(--teal-2); font-size:14px; letter-spacing:.05em;
-  }
+  #loadingBar{ text-align:center; padding:48px 0 56px; color:var(--emerald); font-size:14px; letter-spacing:.08em; text-transform:uppercase; }
   #dashboard{ display:none; }
   #dashboard.show{ display:block; }
 
-  .hero{ display:grid; grid-template-columns: 1.15fr 1fr; gap:28px; margin-bottom:40px; }
-  @media(max-width:880px){ .hero{ grid-template-columns:1fr; } }
+  .hero-grid{ display:grid; grid-template-columns:1.2fr .8fr; gap:22px; margin-bottom:26px; }
+  @media(max-width:880px){ .hero-grid{ grid-template-columns:1fr; } }
+  .hero-card, .mini-stat, .panel, .prayer-card, .amount-card{
+    animation:fadeUp .7s ease both;
+  }
   .hero-card{
-    background: linear-gradient(155deg, var(--teal) 0%, #0a2b27 100%);
-    border-radius:22px; padding:38px 40px; color:var(--cream);
-    position:relative; overflow:hidden; box-shadow:var(--shadow);
+    position:relative; overflow:hidden; border-radius:28px; padding:28px 28px 24px; background:linear-gradient(135deg, rgba(31,77,67,0.98), rgba(20,51,45,0.96)); color:var(--cream);
+    box-shadow:var(--shadow); border:1px solid rgba(231,200,122,0.25);
+    display:flex; gap:18px; align-items:center;
   }
-  .hero-card::before{ content:""; position:absolute; right:-60px; top:-60px; width:240px; height:240px; border:1px solid rgba(230,201,138,0.25); border-radius:50%; }
-  .hero-card::after{ content:""; position:absolute; right:-10px; top:-10px; width:160px; height:160px; border:1px solid rgba(230,201,138,0.18); border-radius:50%; }
-  .hero-label{ font-size:13px; letter-spacing:.14em; text-transform:uppercase; opacity:.7; margin-bottom:16px;}
-  .hero-num{ font-family:'Amiri', serif; font-size:clamp(56px,6vw,88px); font-weight:700; line-height:1; color:var(--gold-soft);}
-  .hero-sub{ margin-top:14px; font-size:15px; line-height:1.6; max-width:420px; opacity:.85;}
+  .hero-card::before{ content:""; position:absolute; right:-60px; top:-60px; width:220px; height:220px; border:1px solid rgba(231,200,122,0.24); border-radius:50%; }
+  .hero-card::after{ content:""; position:absolute; inset:auto -40px -54px auto; width:180px; height:180px; border:1px solid rgba(231,200,122,0.16); border-radius:50%; }
+  .hero-illustration{ flex-shrink:0; }
+  .hero-content{ position:relative; z-index:1; }
+  .hero-label{ font-size:12px; letter-spacing:.24em; text-transform:uppercase; opacity:.86; margin-bottom:8px; }
+  .hero-num{ font-family:var(--font-heading); font-size:clamp(52px,6vw,84px); color:var(--gold-soft); line-height:1; margin-bottom:10px; }
+  .hero-sub{ max-width:430px; font-size:14px; line-height:1.7; color:rgba(248,243,234,0.9); }
 
-  .side-stats{ display:flex; flex-direction:column; gap:18px; }
-  .mini-stat{
-    background:var(--panel); border-radius:18px; padding:20px 24px;
-    display:flex; justify-content:space-between; align-items:center;
-    box-shadow:var(--shadow); border:1px solid var(--line); flex:1;
-  }
-  .mini-stat .l{ font-size:13.5px; color:var(--ink); opacity:.6; }
-  .mini-stat .v{ font-family:var(--font-serif); font-size:26px; font-weight:700; color:var(--teal-2); text-align:right; }
+  .side-stats{ display:flex; flex-direction:column; gap:16px; }
+  .mini-stat{ background:rgba(255,255,255,0.72); border:1px solid var(--line); border-radius:18px; padding:18px 20px; display:flex; justify-content:space-between; align-items:center; gap:12px; }
+  .mini-stat .l{ font-size:12.5px; color:var(--muted); text-transform:uppercase; letter-spacing:.14em; }
+  .mini-stat .v{ font-family:var(--font-heading); font-size:22px; color:var(--emerald); text-align:right; line-height:1.1; }
 
-  .section-title{ display:flex; align-items:baseline; gap:12px; margin: 46px 0 20px; }
-  .section-title h2{ font-family:var(--font-serif); font-size:24px; color:var(--teal); font-weight:700; }
-  .section-title span{ font-size:12.5px; color:var(--ink); opacity:.5; letter-spacing:.05em; }
-  .section-title::after{ content:""; flex:1; height:1px; background:var(--line); }
-  .year-filter{
-    font-family:'Work Sans', sans-serif; font-size:12.5px; font-weight:600; color:var(--teal-2);
-    background:var(--panel); border:1px solid var(--line); border-radius:20px; padding:5px 14px;
-    cursor:pointer; letter-spacing:.03em;
-  }
+  .section-title{ display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin:34px 0 18px; padding-top:8px; }
+  .section-title::after{ content:""; flex:1; min-width:120px; height:1px; background:linear-gradient(90deg, rgba(184,138,59,0.28), rgba(184,138,59,0)); }
+  .section-icon{ display:inline-grid; place-items:center; width:28px; height:28px; border:1px solid rgba(184,138,59,0.3); border-radius:50%; color:var(--gold); font-size:13px; }
+  .section-title h2{ font-family:var(--font-heading); font-size:22px; color:var(--emerald); font-weight:700; letter-spacing:.01em; }
+  .section-kicker{ font-size:12px; color:var(--muted); letter-spacing:.16em; text-transform:uppercase; }
+  .year-filter{ margin-left:auto; font-family:var(--font-body); font-size:12px; font-weight:600; color:var(--emerald); background:rgba(255,255,255,0.8); border:1px solid var(--line); border-radius:999px; padding:7px 12px; cursor:pointer; }
 
-  .rings{ display:grid; grid-template-columns:repeat(5,1fr); gap:18px; }
-  @media(max-width:900px){ .rings{ grid-template-columns:repeat(2,1fr);} }
-  @media(max-width:520px){ .rings{ grid-template-columns:1fr;} }
-  .ring-card{ background:var(--panel); border-radius:18px; padding:24px 18px 20px; text-align:center; box-shadow:var(--shadow); border:1px solid var(--line); }
-  .ring-card .name{ font-weight:600; font-size:15px; color:var(--teal); margin-bottom:14px; }
-  .ring-card svg{ width:108px; height:108px; }
-  .ring-pct{ font-family:var(--font-serif); font-size:21px; font-weight:700; fill:var(--teal); }
-  .ring-card .counts{ margin-top:12px; font-size:12.5px; color:var(--ink); opacity:.6; line-height:1.5; }
-  .ring-card .counts b{ opacity:1; color:var(--ink); }
-  .perday-row{ margin-top:14px; padding-top:12px; border-top:1px dashed var(--line); display:flex; flex-direction:column; align-items:center; gap:6px; }
-  .perday-row label{ font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:var(--ink); opacity:.5; }
-  .perday-input{
-    width:64px; text-align:center; font-family:'Work Sans', sans-serif; font-size:13px; font-weight:600;
-    color:var(--teal-2); border:1px solid var(--line); border-radius:10px; padding:5px 6px;
-    background:var(--cream);
-  }
-  .perday-input:focus{ outline:none; border-color:var(--teal-2); }
-  .days-to-complete{ font-size:12px; font-weight:600; color:var(--gold); min-height:15px; }
+  .prayer-grid{ display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:18px; }
+  @media(max-width:900px){ .prayer-grid{ grid-template-columns:1fr; } }
+  .prayer-card{ position:relative; padding:22px 20px 20px; border:1px solid rgba(184,138,59,0.35); border-radius:24px; background:var(--cream); box-shadow:0 10px 26px rgba(31,77,67,0.06); transition:transform .3s ease, box-shadow .3s ease, border-color .3s ease; overflow:hidden; }
+  .prayer-card:hover{ transform:translateY(-4px); box-shadow:0 16px 30px rgba(31,77,67,0.12); border-color:rgba(184,138,59,0.6); }
+  .prayer-card::before{ content:""; position:absolute; left:-20px; top:-20px; width:120px; height:120px; border-radius:50%; border:1px solid rgba(184,138,59,0.16); }
+  .prayer-badge{ position:absolute; top:16px; right:16px; width:44px; height:44px; display:grid; place-items:center; border-radius:50%; background:linear-gradient(135deg, var(--gold), #d8b46c); color:#fff; font-family:var(--font-heading); font-size:16px; font-weight:700; box-shadow:0 8px 16px rgba(184,138,59,0.22); }
+  .prayer-head{ display:flex; justify-content:space-between; align-items:flex-start; gap:12px; margin-bottom:10px; }
+  .prayer-head h3{ font-family:var(--font-heading); font-size:20px; color:var(--emerald); font-weight:700; margin-bottom:3px; }
+  .prayer-subtitle{ font-size:12px; color:var(--muted); text-transform:uppercase; letter-spacing:.16em; }
+  .prayer-score{ font-family:var(--font-heading); font-size:22px; color:var(--gold); font-weight:700; }
+  .prayer-ring-wrap{ display:flex; justify-content:center; margin:8px 0 14px; }
+  .prayer-ring{ width:108px; height:108px; }
+  .ring-pct{ font-family:var(--font-heading); font-size:20px; fill:var(--emerald); font-weight:700; }
+  .prayer-rakats{ list-style:none; display:grid; gap:7px; margin:0 0 14px; }
+  .prayer-rakats li{ position:relative; padding-left:15px; font-size:13px; color:var(--text); }
+  .prayer-rakats li::before{ content:"•"; position:absolute; left:0; color:var(--gold); }
+  .prayer-meta{ display:flex; justify-content:space-between; gap:10px; font-size:12px; color:var(--muted); margin-bottom:12px; }
+  .prayer-meta span{ color:var(--emerald); font-weight:700; }
+  .perday-row{ padding-top:12px; border-top:1px dashed rgba(184,138,59,0.32); display:flex; flex-direction:column; align-items:flex-start; gap:6px; }
+  .perday-row label{ font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:var(--muted); }
+  .perday-input{ width:72px; border:1px solid rgba(31,77,67,0.16); border-radius:999px; background:#fffdf9; padding:6px 10px; font-family:var(--font-body); font-size:13px; color:var(--emerald); }
+  .perday-input:focus{ outline:none; border-color:rgba(184,138,59,0.5); }
+  .days-to-complete{ min-height:16px; font-size:12px; color:var(--gold); font-weight:600; }
 
-  .panel{ background:var(--panel); border-radius:20px; padding:30px 30px 14px; box-shadow:var(--shadow); border:1px solid var(--line); }
+  .panel{ background:rgba(255,255,255,0.74); border:1px solid var(--line); border-radius:24px; padding:22px 22px 18px; box-shadow:0 10px 28px rgba(31,77,67,0.06); }
   .chart-wrap{ height:320px; }
 
-  .sadaqah-grid{ display:grid; grid-template-columns: 1.3fr 1fr; gap:24px; }
+  .sadaqah-grid{ display:grid; grid-template-columns:1.3fr .7fr; gap:22px; }
   @media(max-width:880px){ .sadaqah-grid{ grid-template-columns:1fr; } }
   .table-scroll{ max-height:242px; overflow-y:auto; }
-  table{ width:100%; border-collapse:collapse; font-size:14px; }
+  table{ width:100%; border-collapse:collapse; font-size:13px; }
   table.sadaqa-fixed{ table-layout:fixed; }
-  th{ text-align:left; font-size:12px; text-transform:uppercase; letter-spacing:.08em; color:var(--ink); opacity:.55; font-weight:600; padding:0 6px 12px; border-bottom:1px solid var(--line); }
-  td{ padding:14px 6px; border-bottom:1px solid var(--line); color:var(--ink); }
+  th{ text-align:left; font-size:11px; text-transform:uppercase; letter-spacing:.16em; color:var(--muted); font-weight:600; padding:0 6px 12px; border-bottom:1px solid var(--line); }
+  td{ padding:12px 6px; border-bottom:1px solid rgba(31,77,67,0.08); color:var(--text); }
   tr:last-child td{ border-bottom:none; }
-  .tag{ display:inline-block; background:rgba(199,154,75,0.14); color:var(--gold); font-weight:600; font-size:12.5px; padding:3px 10px; border-radius:20px; }
-  .sadaqah-side{ display:flex; flex-direction:column; gap:18px; }
-  .amount-card{ background:linear-gradient(155deg, var(--teal-2), var(--teal)); color:var(--cream); border-radius:18px; padding:26px 26px; box-shadow:var(--shadow); }
-  .amount-card .l{ font-size:12.5px; opacity:.7; letter-spacing:.08em; text-transform:uppercase; margin-bottom:8px;}
-  .amount-card .v{ font-family:var(--font-serif); font-size:34px; font-weight:700; color:var(--gold-soft); }
-  .amount-card .foot{ margin-top:10px; font-size:12.5px; opacity:.75; }
+  .tag{ display:inline-block; background:rgba(184,138,59,0.16); color:var(--gold); font-weight:600; font-size:12px; padding:4px 9px; border-radius:999px; }
+  .sadaqah-side{ display:flex; flex-direction:column; gap:16px; }
+  .amount-card{ background:linear-gradient(135deg, var(--emerald), var(--emerald-deep)); color:var(--cream); border-radius:22px; padding:22px; box-shadow:var(--shadow); }
+  .amount-card .l{ font-size:11px; letter-spacing:.18em; text-transform:uppercase; opacity:.72; margin-bottom:8px; }
+  .amount-card .v{ font-family:var(--font-heading); font-size:30px; color:var(--gold-soft); line-height:1.1; }
+  .amount-card .foot{ margin-top:10px; font-size:12px; color:rgba(248,243,234,0.8); }
 
-  footer{ margin-top:56px; text-align:center; font-size:12.5px; color:var(--ink); opacity:.45; }
+  .site-footer{ margin-top:36px; padding-top:18px; border-top:1px solid rgba(31,77,67,0.12); display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; color:var(--muted); font-size:12px; }
+  .site-footer .footer-note{ display:flex; align-items:center; gap:8px; }
+
+  @keyframes fadeUp{ from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);} }
+  @keyframes floatIcon{ 0%,100%{ transform:translateY(0);} 50%{ transform:translateY(-6px);} }
+
+  @media(max-width:640px){
+    body{ padding:14px 12px 32px; }
+    .page-shell{ border-radius:28px; padding:24px 16px 28px; }
+    .page-shell::after{ width:94%; top:-60px; }
+    .hero-card{ flex-direction:column; align-items:flex-start; }
+    .meta-bar{ padding:12px 0 16px; }
+    .site-footer{ flex-direction:column; align-items:flex-start; }
+  }
 </style>
 </head>
 <body>
 <div class="wrap">
-
-  <header>
-    <div>
+  <div class="page-shell">
+    <header class="page-header">
+      <div class="header-ornaments" aria-hidden="true">
+        <svg class="decor-icon" viewBox="0 0 64 64" fill="none"><path d="M31 7c2 5 4 9 4 14 0 8-5 14-8 20-4 8-2 16 3 22 6-5 11-12 12-20 2-7 2-12 1-18-1-6-3-10-12-18Z" stroke="#B88A3B" stroke-width="2"/><path d="M33 7c-2 5-4 9-4 14 0 8 5 14 8 20 4 8 2 16-3 22-6-5-11-12-12-20-2-7-2-12-1-18 1-6 3-10 12-18Z" stroke="#1F4D43" stroke-width="2"/></svg>
+        <svg class="decor-icon delay-2" viewBox="0 0 64 64" fill="none"><path d="M18 24h28M18 36h28M20 16h24a4 4 0 0 1 4 4v24a4 4 0 0 1-4 4H20a4 4 0 0 1-4-4V20a4 4 0 0 1 4-4Z" stroke="#B88A3B" stroke-width="2"/><path d="M24 24v24M40 24v24" stroke="#1F4D43" stroke-width="2"/></svg>
+        <svg class="decor-icon delay-3" viewBox="0 0 64 64" fill="none"><path d="M32 10c9 0 16 7 16 16 0 8-7 13-11 19-4-6-11-11-11-19 0-9 7-16 16-16Z" stroke="#B88A3B" stroke-width="2"/><path d="M23 47h18" stroke="#1F4D43" stroke-width="2"/></svg>
+      </div>
       <div class="eyebrow">Personal Ibadah Record</div>
-      <h1>Salah &amp; Sadaqah Dashboard</h1>
-    </div>
-    <div class="period">
-      <span id="periodText">Loading tracking window…</span><br>
-      <button class="refresh-btn" onclick="loadAll()">↻ Refresh Data</button>
-    </div>
-  </header>
+      <h1>Salah Chart</h1>
+      <div class="subtitle">Har Muslim Ko Maloom Hona Chahiye</div>
+    </header>
 
-  <div id="statusBar"></div>
-  <div id="loadingBar">Fetching live data from Google Sheets…</div>
+    <div class="meta-bar">
+      <div class="period" id="periodText">Loading tracking window…</div>
+      <button class="refresh-btn" onclick="loadAll()">Refresh Data</button>
+    </div>
 
-  <div id="dashboard">
-    <div class="hero">
-      <div class="hero-card">
-        <div class="hero-label">Overall Salah Completion</div>
-        <div class="hero-num" id="heroPct">—%</div>
-        <div class="hero-sub">Average of all five daily prayers logged against every day since tracking began. Updates automatically from the Daily sheet.</div>
+    <div id="statusBar"></div>
+    <div id="loadingBar">Fetching live data from Google Sheets…</div>
+
+    <div id="dashboard">
+      <div class="hero-grid">
+        <div class="hero-card">
+          <div class="hero-illustration" aria-hidden="true">
+            <svg width="92" height="92" viewBox="0 0 92 92" fill="none">
+              <path d="M46 12c14 0 25 11 25 25 0 15-15 27-25 41-10-14-25-26-25-41 0-14 11-25 25-25Z" fill="rgba(231,200,122,0.18)" stroke="#E7C87A" stroke-width="2"/>
+              <path d="M46 29c7 0 12 5 12 12 0 6-4 10-8 15-4-5-8-9-8-15 0-7 5-12 12-12Z" fill="#F8F3EA" fill-opacity="0.95"/>
+              <path d="M30 66h32" stroke="#E7C87A" stroke-width="2" stroke-linecap="round"/>
+              <path d="M26 76h40" stroke="#E7C87A" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="hero-content">
+            <div class="hero-label">Overall Salah Completion</div>
+            <div class="hero-num" id="heroPct">—%</div>
+            <div class="hero-sub">A calm view of every prayer logged against the full tracking history, presented with elegance and clarity.</div>
+          </div>
+        </div>
+        <div class="side-stats">
+          <div class="mini-stat"><span class="l">Total prayers logged</span><span class="v" id="totalLogged">—</span></div>
+          <div class="mini-stat"><span class="l">Total prayers remaining</span><span class="v" id="totalRemaining">—</span></div>
+          <div class="mini-stat"><span class="l">Strongest prayer</span><span class="v" id="bestPrayer">—</span></div>
+        </div>
       </div>
-      <div class="side-stats">
-        <div class="mini-stat"><span class="l">Total prayers logged</span><span class="v" id="totalLogged">—</span></div>
-        <div class="mini-stat"><span class="l">Total prayers Remaining</span><span class="v" id="totalRemaining">—</span></div>
-        <div class="mini-stat"><span class="l">Strongest prayer</span><span class="v" id="bestPrayer">—</span></div>
-      </div>
-    </div>
 
-    <div class="section-title"><h2>Prayer-wise Completion</h2><span>% of tracked days</span><select class="year-filter" id="prayerYearFilter" onchange="onPrayerYearChange()"></select></div>
-    <div class="rings" id="ringsRow"></div>
+      <div class="section-title"><span class="section-icon">☼</span><h2>Prayer Overview</h2><span class="section-kicker">% of tracked days</span><select class="year-filter" id="prayerYearFilter" onchange="onPrayerYearChange()"></select></div>
+      <div class="prayer-grid" id="ringsRow"></div>
 
-    <div class="section-title"><h2>Yearly Trend</h2><span id="yearRange"></span></div>
-    <div class="panel"><div class="chart-wrap"><canvas id="yearlyChart"></canvas></div></div>
+      <div class="section-title"><span class="section-icon">◌</span><h2>Yearly Trend</h2><span class="section-kicker" id="yearRange"></span></div>
+      <div class="panel"><div class="chart-wrap"><canvas id="yearlyChart"></canvas></div></div>
 
-    <div class="section-title"><h2>Sadaqah Plan</h2><span id="sadaqaRange"></span><select class="year-filter" id="sadaqaYearFilter" onchange="onSadqaYearChange()"></select></div>
-    <div class="sadaqah-grid">
-      <div class="panel" style="padding-top:22px;">
-        <table class="sadaqa-fixed">
-          <colgroup><col style="width:22%"><col style="width:18%"><col style="width:14%"><col style="width:26%"><col style="width:20%"></colgroup>
-          <thead><tr><th>Month</th><th>Salary</th><th>Rate</th><th>Planned Sadaqah</th><th>Payment Date</th></tr></thead>
-        </table>
-        <div class="table-scroll">
+      <div class="section-title"><span class="section-icon">✦</span><h2>Sadaqah Plan</h2><span class="section-kicker" id="sadaqaRange"></span><select class="year-filter" id="sadaqaYearFilter" onchange="onSadqaYearChange()"></select></div>
+      <div class="sadaqah-grid">
+        <div class="panel" style="padding-top:22px;">
           <table class="sadaqa-fixed">
             <colgroup><col style="width:22%"><col style="width:18%"><col style="width:14%"><col style="width:26%"><col style="width:20%"></colgroup>
-            <tbody id="sadaqaBody"></tbody>
+            <thead><tr><th>Month</th><th>Salary</th><th>Rate</th><th>Planned Sadaqah</th><th>Payment Date</th></tr></thead>
           </table>
+          <div class="table-scroll">
+            <table class="sadaqa-fixed">
+              <colgroup><col style="width:22%"><col style="width:18%"><col style="width:14%"><col style="width:26%"><col style="width:20%"></colgroup>
+              <tbody id="sadaqaBody"></tbody>
+            </table>
+          </div>
         </div>
-      </div>
-      <div class="sadaqah-side">
-        <div class="amount-card">
-          <div class="l">Planned so far</div>
-          <div class="v" id="sadaqaTotal">Rs —</div>
-          <div class="foot" id="sadaqaFoot">—</div>
+        <div class="sadaqah-side">
+          <div class="amount-card">
+            <div class="l">Planned so far</div>
+            <div class="v" id="sadaqaTotal">Rs —</div>
+            <div class="foot" id="sadaqaFoot">—</div>
+          </div>
+          <div class="mini-stat"><span class="l">Projected annual sadaqah</span><span class="v" id="sadaqaAnnual">Rs —</span></div>
         </div>
-        <div class="mini-stat"><span class="l">Projected annual sadaqah</span><span class="v" id="sadaqaAnnual">Rs —</span></div>
       </div>
     </div>
-  </div>
 
-  <footer>Live from Google Sheets · Islam Timeline &nbsp;·&nbsp; <span id="lastUpdated"></span></footer>
+    <footer class="site-footer">
+      <div class="footer-note"><svg width="24" height="24" viewBox="0 0 64 64" fill="none" aria-hidden="true"><path d="M20 18h24v28H20z" stroke="#1F4D43" stroke-width="2"/><path d="M24 22h16v20H24z" stroke="#B88A3B" stroke-width="2"/><path d="M28 28h8" stroke="#1F4D43" stroke-width="2"/><path d="M28 34h8" stroke="#1F4D43" stroke-width="2"/><path d="M24 10c4 4 6 7 6 12" stroke="#B88A3B" stroke-width="2" stroke-linecap="round"/><path d="M40 10c-4 4-6 7-6 12" stroke="#B88A3B" stroke-width="2" stroke-linecap="round"/></svg><span>Live from Google Sheets · Islam Timeline</span></div>
+      <span id="lastUpdated"></span>
+    </footer>
+  </div>
 </div>
 
 <script>
@@ -343,40 +425,51 @@ function renderRings(yearFilter){
   const totals = {Fajr:0, Zuhr:0, Asr:0, Maghrib:0, Isha:0};
   scoped.forEach(e => PRAYER_NAMES.forEach(p => { if (e.flags[p]) totals[p]++; }));
   const prayers = PRAYER_NAMES.map(name => ({
-    name, total: totals[name], pct: trackedDays ? (totals[name]/trackedDays*100) : 0
+    name, total: totals[name], pct: trackedDays ? (totals[name]/trackedDays*100) : 0,
+    rakats: name === 'Fajr' ? ['2 Sunnah', '2 Fard'] : name === 'Zuhr' ? ['4 Sunnah', '4 Fard', '2 Sunnah'] : name === 'Asr' ? ['4 Fard'] : name === 'Maghrib' ? ['3 Fard', '2 Sunnah'] : ['4 Sunnah', '2 Fard', '1 Witr']
   }));
 
   const ringsRow = document.getElementById('ringsRow');
   ringsRow.innerHTML = '';
-  const R = 46, C = 2*Math.PI*R;
-  prayers.forEach(p=>{
+  const R = 42, C = 2*Math.PI*R;
+  prayers.forEach((p, index)=>{
     const offset = C - (p.pct/100)*C;
     const remaining = trackedDays - p.total;
-    const card = document.createElement('div');
-    card.className='ring-card';
+    const card = document.createElement('article');
+    card.className='prayer-card';
     card.innerHTML = `
-      <div class="name">${p.name}</div>
-      <svg viewBox="0 0 108 108">
-        <circle cx="54" cy="54" r="${R}" fill="none" stroke="#eef1ee" stroke-width="10"/>
-        <circle cx="54" cy="54" r="${R}" fill="none" stroke="url(#grad-${p.name})" stroke-width="10"
-          stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${offset}"
-          transform="rotate(-90 54 54)"/>
-        <defs>
-          <linearGradient id="grad-${p.name}" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stop-color="#0e3a35"/><stop offset="100%" stop-color="#c79a4b"/>
-          </linearGradient>
-        </defs>
-        <text x="54" y="60" text-anchor="middle" class="ring-pct">${p.pct.toFixed(2)}%</text>
-      </svg>
-      <div class="counts">
-        <b>${p.total.toLocaleString()}</b> of ${trackedDays.toLocaleString()} days<br>
-        Remaining: <b>${remaining.toLocaleString()}</b>
+      <div class="prayer-badge">${index + 1}</div>
+      <div class="prayer-head">
+        <div>
+          <h3>${p.name}</h3>
+          <div class="prayer-subtitle">Daily Prayer</div>
+        </div>
+        <div class="prayer-score">${p.pct.toFixed(0)}%</div>
+      </div>
+      <div class="prayer-ring-wrap">
+        <svg class="prayer-ring" viewBox="0 0 108 108">
+          <circle cx="54" cy="54" r="${R}" fill="none" stroke="#efe4cf" stroke-width="10"/>
+          <circle cx="54" cy="54" r="${R}" fill="none" stroke="url(#grad-${p.name})" stroke-width="10"
+            stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${offset}"
+            transform="rotate(-90 54 54)"/>
+          <defs>
+            <linearGradient id="grad-${p.name}" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#1F4D43"/><stop offset="100%" stop-color="#B88A3B"/>
+            </linearGradient>
+          </defs>
+          <text x="54" y="60" text-anchor="middle" class="ring-pct">${p.pct.toFixed(1)}%</text>
+        </svg>
+      </div>
+      <ul class="prayer-rakats">
+        ${p.rakats.map(r => `<li>${r}</li>`).join('')}
+      </ul>
+      <div class="prayer-meta">
+        <div>Completed <span>${p.total.toLocaleString()}</span></div>
+        <div>Remaining <span>${remaining.toLocaleString()}</span></div>
       </div>
       <div class="perday-row">
-        <label for="perday-${p.name}">Per day</label>
-        <input type="number" min="1" step="1" class="perday-input" id="perday-${p.name}"
-          value="${perDayInputs[p.name] ?? ''}" placeholder="e.g. 2"
-          oninput="onPerDayChange('${p.name}', ${remaining})">
+        <label for="perday-${p.name}">Per Day</label>
+        <input type="number" min="1" step="1" class="perday-input" id="perday-${p.name}" value="${perDayInputs[p.name] ?? ''}" placeholder="2" oninput="onPerDayChange('${p.name}', ${remaining})">
         <span class="days-to-complete" id="daysLeft-${p.name}"></span>
       </div>
     `;
