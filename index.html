@@ -169,6 +169,8 @@
   .daily-summary h3{ font-family:var(--font-heading); font-size:20px; color:var(--emerald); margin-bottom:10px; }
   .daily-summary .summary-meta{ font-size:13px; color:var(--muted); margin-bottom:14px; }
   .daily-summary .summary-top{ display:flex; justify-content:space-between; align-items:flex-start; gap:16px; flex-wrap:wrap; margin-bottom:14px; }
+  .daily-summary .summary-controls{ display:flex; flex-wrap:wrap; gap:10px; margin-bottom:12px; }
+  .daily-summary .filter-select{ border:1px solid rgba(31,77,67,0.18); background:#fff; color:var(--emerald); border-radius:999px; padding:8px 12px; font-size:12px; font-weight:700; cursor:pointer; box-shadow:0 8px 16px rgba(31,77,67,0.06); }
   .daily-summary .progress-row{ display:flex; align-items:center; gap:10px; margin-bottom:12px; font-weight:600; color:var(--emerald); }
   .daily-summary .progress-pill{ display:inline-flex; align-items:center; justify-content:center; min-width:54px; padding:6px 10px; border-radius:999px; background:rgba(31,77,67,0.1); color:var(--emerald); font-size:13px; }
   .daily-summary .date-picker{ position:relative; margin-bottom:12px; }
@@ -276,17 +278,27 @@
             <div class="summary-meta">Date: <strong id="todayDate">Today</strong></div>
           </div>
         </div>
-        <div class="date-picker" id="dailyDatePicker">
-          <button type="button" class="date-picker-trigger" id="dailyDateTrigger">Select date</button>
-          <div class="calendar-popup" id="dailyCalendarPopup" hidden>
-            <div class="calendar-controls">
-              <select id="calendarYear"></select>
-              <select id="calendarMonth"></select>
+        <div class="summary-controls">
+          <select class="filter-select" id="dailyPrayerFilter">
+            <option value="All">All prayers</option>
+            <option value="Fajr">Fajr</option>
+            <option value="Dhuhr">Dhuhr</option>
+            <option value="Asr">Asr</option>
+            <option value="Maghrib">Maghrib</option>
+            <option value="Isha">Isha</option>
+          </select>
+          <div class="date-picker" id="dailyDatePicker">
+            <button type="button" class="date-picker-trigger" id="dailyDateTrigger">Select date</button>
+            <div class="calendar-popup" id="dailyCalendarPopup" hidden>
+              <div class="calendar-controls">
+                <select id="calendarYear"></select>
+                <select id="calendarMonth"></select>
+              </div>
+              <div class="calendar-weekdays">
+                <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
+              </div>
+              <div class="calendar-days" id="calendarDays"></div>
             </div>
-            <div class="calendar-weekdays">
-              <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
-            </div>
-            <div class="calendar-days" id="calendarDays"></div>
           </div>
         </div>
         <div class="progress-row">Prayer Progress: <span class="progress-pill" id="dailyProgress">0 / 5</span></div>
@@ -430,6 +442,7 @@ function renderPrayerStats(rows){
   const dailyList = document.getElementById('dailyPrayerList');
   const calendarTrigger = document.getElementById('dailyDateTrigger');
   const calendarPopup = document.getElementById('dailyCalendarPopup');
+  const prayerFilterSelect = document.getElementById('dailyPrayerFilter');
   const yearSelect = document.getElementById('calendarYear');
   const monthSelect = document.getElementById('calendarMonth');
   const calendarDays = document.getElementById('calendarDays');
@@ -440,18 +453,31 @@ function renderPrayerStats(rows){
   const years = [...new Set(dailyDayEntries.map(e => e.year))].sort((a, b) => a - b);
   const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
   let selectedSummaryDate = null;
+  let selectedPrayerFilter = 'All';
 
   yearSelect.innerHTML = years.map(y => `<option value="${y}">${y}</option>`).join('');
   monthSelect.innerHTML = monthNames.map((name, index) => `<option value="${index}">${name}</option>`).join('');
 
   const firstIncomplete = incompleteDates[0];
+  const firstAvailableDate = dailyDayEntries[0] ? dailyDayEntries[0].date : null;
   if (firstIncomplete) {
     selectedSummaryDate = firstIncomplete.date;
     renderDailySummaryForDate(firstIncomplete.date);
+  } else if (firstAvailableDate) {
+    selectedSummaryDate = firstAvailableDate;
+    renderDailySummaryForDate(firstAvailableDate);
   } else {
     document.getElementById('dailyProgress').textContent = '0 / 5';
-    dailyList.innerHTML = '<div class="prayer-item pending">No incomplete dates found.</div>';
+    dailyList.innerHTML = '<div class="prayer-item pending">No prayer data found.</div>';
   }
+
+  prayerFilterSelect.addEventListener('change', () => {
+    selectedPrayerFilter = prayerFilterSelect.value;
+    if (selectedSummaryDate) {
+      renderDailySummaryForDate(selectedSummaryDate);
+    }
+    renderCalendarView();
+  });
 
   calendarTrigger.addEventListener('click', () => {
     calendarPopup.hidden = !calendarPopup.hidden;
@@ -479,6 +505,7 @@ function renderPrayerStats(rows){
     const firstDay = new Date(year, month, 1).getDay();
     const totalDays = new Date(year, month + 1, 0).getDate();
     const today = new Date(); today.setHours(0,0,0,0);
+    const visiblePrayers = selectedPrayerFilter === 'All' ? PRAYER_NAMES : [selectedPrayerFilter];
     calendarDays.innerHTML = '';
 
     for (let i = 0; i < firstDay; i++) {
@@ -491,8 +518,8 @@ function renderPrayerStats(rows){
     for (let day = 1; day <= totalDays; day++) {
       const date = new Date(year, month, day);
       const entry = dailyDayEntries.find(item => item.date.toDateString() === date.toDateString());
-      const count = entry ? PRAYER_NAMES.filter(p => entry.flags[p]).length : 0;
-      const isIncomplete = entry && count < PRAYER_NAMES.length;
+      const count = entry ? visiblePrayers.filter(p => entry.flags[p]).length : 0;
+      const isIncomplete = entry ? count < visiblePrayers.length : false;
       const button = document.createElement('button');
       button.type = 'button';
       button.className = 'calendar-day';
@@ -500,27 +527,25 @@ function renderPrayerStats(rows){
       if (date.toDateString() === today.toDateString()) button.classList.add('is-today');
       if (entry) {
         button.classList.add(isIncomplete ? 'is-incomplete' : 'is-complete');
-      } else {
-        button.classList.add('is-empty');
-      }
-      button.textContent = day;
-      if (entry && isIncomplete) {
         button.onclick = () => renderDailySummaryForDate(date);
       } else {
+        button.classList.add('is-empty');
         button.disabled = true;
       }
+      button.textContent = day;
       calendarDays.appendChild(button);
     }
   }
 
   function renderDailySummaryForDate(date){
     const entry = dailyDayEntries.find(item => item.date.toDateString() === date.toDateString());
-    const count = entry ? PRAYER_NAMES.filter(p => entry.flags[p]).length : 0;
+    const visiblePrayers = selectedPrayerFilter === 'All' ? PRAYER_NAMES : [selectedPrayerFilter];
+    const count = entry ? visiblePrayers.filter(p => entry.flags[p]).length : 0;
     selectedSummaryDate = date;
     document.getElementById('todayDate').textContent = date.toLocaleDateString(undefined, {weekday:'short', year:'numeric', month:'short', day:'numeric'});
-    document.getElementById('dailyProgress').textContent = `${count} / ${PRAYER_NAMES.length}`;
+    document.getElementById('dailyProgress').textContent = `${count} / ${visiblePrayers.length}`;
     dailyList.innerHTML = '';
-    PRAYER_NAMES.forEach(prayer => {
+    visiblePrayers.forEach(prayer => {
       const item = document.createElement('div');
       const done = entry ? entry.flags[prayer] : false;
       item.className = `prayer-item ${done ? 'done' : 'pending'}`;
