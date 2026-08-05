@@ -1,0 +1,8 @@
+{
+    "chat.tools.terminal.autoApprove": {
+        "/^cd /d e:\\\\Personal Project\\\\Personal_Ibadah_Record ; python -m http\\.server 8000$/": {
+            "approve": true,
+            "matchCommandLine": true
+        }
+    }
+}

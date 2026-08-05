@@ -55,7 +55,7 @@
     border-radius:44px 44px 34px 34px;
     box-shadow:var(--shadow);
     padding:34px clamp(18px,3vw,42px) 36px;
-    overflow:hidden;
+    overflow:visible;
     backdrop-filter:blur(8px);
   }
   .page-shell::before{
@@ -165,19 +165,19 @@
   .days-to-complete{ min-height:16px; font-size:12px; color:var(--gold); font-weight:600; }
 
   .panel{ background:rgba(255,255,255,0.74); border:1px solid var(--line); border-radius:24px; padding:22px 22px 18px; box-shadow:0 10px 28px rgba(31,77,67,0.06); }
-  .daily-summary{ margin-bottom:24px; padding:22px 24px; border-radius:24px; background:linear-gradient(135deg, rgba(255,255,255,0.88), rgba(248,243,234,0.95)); border:1px solid rgba(184,138,59,0.22); box-shadow:0 12px 30px rgba(31,77,67,0.08); }
+  .daily-summary{ position:relative; margin-bottom:24px; padding:22px 24px; border-radius:24px; background:linear-gradient(135deg, rgba(255,255,255,0.88), rgba(248,243,234,0.95)); border:1px solid rgba(184,138,59,0.22); box-shadow:0 12px 30px rgba(31,77,67,0.08); }
   .daily-summary h3{ font-family:var(--font-heading); font-size:20px; color:var(--emerald); margin-bottom:10px; }
   .daily-summary .summary-meta{ font-size:13px; color:var(--muted); margin-bottom:14px; }
   .daily-summary .summary-top{ display:flex; justify-content:space-between; align-items:flex-start; gap:16px; flex-wrap:wrap; margin-bottom:14px; }
-  .daily-summary .summary-controls{ display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-bottom:12px; }
-  .daily-summary .filter-select, .daily-summary .date-picker-trigger{ width:140px; min-height:40px; border:1px solid rgba(31,77,67,0.18); background:#fff; color:var(--emerald); border-radius:999px; padding:8px 12px; font-size:12px; font-weight:700; cursor:pointer; box-shadow:0 8px 16px rgba(31,77,67,0.06); display:inline-flex; align-items:center; justify-content:center; }
+  .daily-summary .summary-controls{ display:flex; flex-wrap:nowrap; gap:10px; align-items:center; margin-left:auto; margin-bottom:0; }
+  .daily-summary .filter-select, .daily-summary .date-picker-trigger{ width:140px; min-height:40px; border:1px solid rgba(31,77,67,0.18); background:#fff; color:var(--emerald); border-radius:999px; padding:8px 12px; font-size:12px; font-weight:700; cursor:pointer; box-shadow:0 8px 16px rgba(31,77,67,0.06); display:inline-flex; align-items:center; justify-content:center; line-height:1; }
   .daily-summary .filter-select:hover, .daily-summary .date-picker-trigger:hover{ border-color:rgba(0,163,108,0.3); }
   .daily-summary .progress-row{ display:flex; align-items:center; gap:10px; margin-bottom:12px; font-weight:600; color:var(--emerald); }
   .daily-summary .progress-pill{ display:inline-flex; align-items:center; justify-content:center; min-width:54px; padding:6px 10px; border-radius:999px; background:rgba(31,77,67,0.1); color:var(--emerald); font-size:13px; }
-  .daily-summary .date-picker{ position:relative; margin-bottom:12px; }
+  .daily-summary .date-picker{ position:relative; display:flex; align-items:center; }
   .daily-summary .date-picker-trigger{ display:inline-flex; align-items:center; gap:8px; border:1px solid rgba(31,77,67,0.18); background:#fff; color:var(--emerald); border-radius:999px; padding:8px 12px; font-size:12px; font-weight:700; cursor:pointer; box-shadow:0 8px 16px rgba(31,77,67,0.06); }
   .daily-summary .date-picker-trigger:hover{ border-color:rgba(0,163,108,0.3); }
-  .daily-summary .calendar-popup{ position:absolute; top:calc(100% + 8px); left:0; z-index:10; width:min(320px, 100%); padding:14px; border-radius:18px; background:rgba(255,253,249,0.98); border:1px solid rgba(31,77,67,0.16); box-shadow:0 18px 40px rgba(31,77,67,0.15); backdrop-filter:blur(10px); }
+  .daily-summary .calendar-popup{ position:absolute; top:calc(100% + 8px); left:0; z-index:2000; width:min(320px, calc(100vw - 24px)); max-height:min(340px, calc(100vh - 24px)); overflow:auto; padding:14px; border-radius:18px; background:rgba(255,253,249,0.99); border:1px solid rgba(31,77,67,0.16); box-shadow:0 18px 40px rgba(31,77,67,0.18); backdrop-filter:blur(10px); }
   .daily-summary .calendar-controls{ display:flex; gap:8px; margin-bottom:10px; }
   .daily-summary .calendar-controls select{ flex:1; border:1px solid rgba(31,77,67,0.14); border-radius:10px; padding:7px 8px; font-size:12px; color:var(--emerald); background:#fff; }
   .daily-summary .calendar-weekdays, .daily-summary .calendar-days{ display:grid; grid-template-columns:repeat(7, 1fr); gap:6px; }
@@ -278,27 +278,27 @@
             <h3>Daily Summary</h3>
             <div class="summary-meta">Date: <strong id="todayDate">Today</strong></div>
           </div>
-        </div>
-        <div class="summary-controls">
-          <select class="filter-select" id="dailyPrayerFilter">
-            <option value="All">All prayers</option>
-            <option value="Fajr">Fajr</option>
-            <option value="Dhuhr">Dhuhr</option>
-            <option value="Asr">Asr</option>
-            <option value="Maghrib">Maghrib</option>
-            <option value="Isha">Isha</option>
-          </select>
-          <div class="date-picker" id="dailyDatePicker">
-            <button type="button" class="date-picker-trigger" id="dailyDateTrigger">Select date</button>
-            <div class="calendar-popup" id="dailyCalendarPopup" hidden>
-              <div class="calendar-controls">
-                <select id="calendarYear"></select>
-                <select id="calendarMonth"></select>
+          <div class="summary-controls">
+            <select class="filter-select" id="dailyPrayerFilter">
+              <option value="All">All prayers</option>
+              <option value="Fajr">Fajr</option>
+              <option value="Dhuhr">Dhuhr</option>
+              <option value="Asr">Asr</option>
+              <option value="Maghrib">Maghrib</option>
+              <option value="Isha">Isha</option>
+            </select>
+            <div class="date-picker" id="dailyDatePicker">
+              <button type="button" class="date-picker-trigger" id="dailyDateTrigger">Select date</button>
+              <div class="calendar-popup" id="dailyCalendarPopup" hidden>
+                <div class="calendar-controls">
+                  <select id="calendarYear"></select>
+                  <select id="calendarMonth"></select>
+                </div>
+                <div class="calendar-weekdays">
+                  <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
+                </div>
+                <div class="calendar-days" id="calendarDays"></div>
               </div>
-              <div class="calendar-weekdays">
-                <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
-              </div>
-              <div class="calendar-days" id="calendarDays"></div>
             </div>
           </div>
         </div>
@@ -459,14 +459,15 @@ function renderPrayerStats(rows){
   yearSelect.innerHTML = years.map(y => `<option value="${y}">${y}</option>`).join('');
   monthSelect.innerHTML = monthNames.map((name, index) => `<option value="${index}">${name}</option>`).join('');
 
+  const summaryToday = new Date();
+  summaryToday.setHours(0, 0, 0, 0);
+  const todayEntry = dailyDayEntries.find(item => item.date.toDateString() === summaryToday.toDateString());
   const firstIncomplete = incompleteDates[0];
   const firstAvailableDate = dailyDayEntries[0] ? dailyDayEntries[0].date : null;
-  if (firstIncomplete) {
-    selectedSummaryDate = firstIncomplete.date;
-    renderDailySummaryForDate(firstIncomplete.date);
-  } else if (firstAvailableDate) {
-    selectedSummaryDate = firstAvailableDate;
-    renderDailySummaryForDate(firstAvailableDate);
+  const initialDate = todayEntry ? summaryToday : (firstIncomplete ? firstIncomplete.date : (firstAvailableDate || summaryToday));
+  selectedSummaryDate = initialDate;
+  if (initialDate) {
+    renderDailySummaryForDate(initialDate);
   } else {
     document.getElementById('dailyProgress').textContent = '0 / 5';
     dailyList.innerHTML = '<div class="prayer-item pending">No prayer data found.</div>';
@@ -480,14 +481,17 @@ function renderPrayerStats(rows){
     renderCalendarView();
   });
 
-  calendarTrigger.addEventListener('click', () => {
-    calendarPopup.hidden = !calendarPopup.hidden;
-    if (!calendarPopup.hidden) {
+  calendarTrigger.addEventListener('click', (event) => {
+    event.stopPropagation();
+    if (calendarPopup.hidden) {
       if (selectedSummaryDate) {
         yearSelect.value = String(selectedSummaryDate.getFullYear());
         monthSelect.value = String(selectedSummaryDate.getMonth());
       }
       renderCalendarView();
+      calendarPopup.hidden = false;
+    } else {
+      calendarPopup.hidden = true;
     }
   });
 
@@ -528,7 +532,11 @@ function renderPrayerStats(rows){
       if (date.toDateString() === today.toDateString()) button.classList.add('is-today');
       if (entry) {
         button.classList.add(isIncomplete ? 'is-incomplete' : 'is-complete');
-        button.onclick = () => renderDailySummaryForDate(date);
+        if (isIncomplete) {
+          button.onclick = () => renderDailySummaryForDate(date);
+        } else {
+          button.disabled = true;
+        }
       } else {
         button.classList.add('is-empty');
         button.disabled = true;
@@ -783,6 +791,31 @@ function onSadqaYearChange(){
   renderSadqaTable(document.getElementById('sadaqaYearFilter').value);
 }
 
+function initializeDailySummaryDefaults(){
+  const todayDate = new Date();
+  todayDate.setHours(0, 0, 0, 0);
+  const todayLabel = todayDate.toLocaleDateString(undefined, {weekday:'short', year:'numeric', month:'short', day:'numeric'});
+  const todayShort = todayDate.toLocaleDateString(undefined, {month:'short', day:'numeric', year:'numeric'});
+
+  const todayDateEl = document.getElementById('todayDate');
+  const dailyProgressEl = document.getElementById('dailyProgress');
+  const dailyListEl = document.getElementById('dailyPrayerList');
+  const calendarTriggerEl = document.getElementById('dailyDateTrigger');
+  const calendarPopupEl = document.getElementById('dailyCalendarPopup');
+  const yearSelectEl = document.getElementById('calendarYear');
+  const monthSelectEl = document.getElementById('calendarMonth');
+  const calendarDaysEl = document.getElementById('calendarDays');
+
+  if (todayDateEl) todayDateEl.textContent = todayLabel;
+  if (dailyProgressEl) dailyProgressEl.textContent = '0 / 5';
+  if (dailyListEl) dailyListEl.innerHTML = '<div class="prayer-item pending">No prayer data yet.</div>';
+  if (calendarTriggerEl) calendarTriggerEl.textContent = todayShort;
+  if (yearSelectEl) yearSelectEl.value = String(todayDate.getFullYear());
+  if (monthSelectEl) monthSelectEl.value = String(todayDate.getMonth());
+  if (calendarDaysEl) calendarDaysEl.innerHTML = '';
+  if (calendarPopupEl) calendarPopupEl.hidden = true;
+}
+
 function renderSadqaTable(yearFilter){
   const entries = yearFilter === 'all' ? sadqaEntries : sadqaEntries.filter(e => String(e.month.getFullYear()) === String(yearFilter));
 
@@ -810,6 +843,7 @@ function renderSadqaTable(yearFilter){
   document.getElementById('sadaqaRange').textContent = entries.length ? `${entries[entries.length-1].month.toLocaleDateString(undefined,{month:'short',year:'numeric'})} – ${entries[0].month.toLocaleDateString(undefined,{month:'short',year:'numeric'})}` : '';
 }
 
+initializeDailySummaryDefaults();
 loadAll();
 </script>
 </body>
