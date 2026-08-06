@@ -194,7 +194,8 @@
   .daily-summary .prayer-item{ padding:10px 12px; border-radius:14px; background:rgba(255,255,255,0.72); border:1px solid rgba(31,77,67,0.1); font-size:13px; color:var(--text); }
   .daily-summary .prayer-item.done{ background:rgba(144,238,144,0.22); border-color:rgba(0,163,108,0.25); color:#0f6b4a; font-weight:600; }
   .daily-summary .prayer-item.pending{ background:rgba(255,255,255,0.72); color:var(--muted); }
-  .chart-wrap{ height:320px; }
+  .chart-wrap{ height:320px; overflow-x:auto; overflow-y:hidden; }
+  .chart-wrap-inner{ height:100%; }
 
   .sadaqah-grid{ display:grid; grid-template-columns:1.3fr .7fr; gap:22px; }
   @media(max-width:880px){ .sadaqah-grid{ grid-template-columns:1fr; } }
@@ -310,7 +311,7 @@
       <div class="prayer-grid" id="ringsRow"></div>
 
       <div class="section-title"><span class="section-icon">◌</span><h2>Yearly Trend</h2><span class="section-kicker" id="yearRange"></span></div>
-      <div class="panel"><div class="chart-wrap"><canvas id="yearlyChart"></canvas></div></div>
+      <div class="panel"><div class="chart-wrap" id="yearlyChartWrap"><div class="chart-wrap-inner" id="yearlyChartInner"><canvas id="yearlyChart"></canvas></div></div></div>
 
       <div class="section-title"><span class="section-icon">✦</span><h2>Sadaqah Plan</h2><span class="section-kicker" id="sadaqaRange"></span><select class="year-filter" id="sadaqaYearFilter" onchange="onSadqaYearChange()"></select></div>
       <div class="sadaqah-grid">
@@ -597,23 +598,35 @@ function renderPrayerStats(rows){
   document.getElementById('yearRange').textContent = chartYears.length ? `${chartYears[0]} – ${chartYears[chartYears.length-1]}` : '';
   const colors = {Fajr:'#0e3a35', Dhuhr:'#155e51', Asr:'#4a8577', Maghrib:'#a9c2b3', Isha:'#c79a4b'};
 
-  if (yearlyChartInstance) yearlyChartInstance.destroy();
-  yearlyChartInstance = new Chart(document.getElementById('yearlyChart'), {
-    type:'bar',
-    data:{
-      labels: chartYears,
-      datasets: PRAYER_NAMES.map(p => ({
-        label: p, data: chartYears.map(y => byYear[y][p]), backgroundColor: colors[p], borderRadius:4, maxBarThickness:16
-      }))
-    },
-    options:{
-      responsive:true, maintainAspectRatio:false,
-      plugins:{ legend:{ position:'bottom', labels:{ boxWidth:10, boxHeight:10, usePointStyle:true, font:{family:"'Work Sans'", size:12} } } },
-      scales:{
-        x:{ grid:{ display:false }, ticks:{ font:{family:"'Work Sans'", size:12} } },
-        y:{ grid:{ color:'rgba(14,58,53,0.06)' }, ticks:{ font:{family:"'Work Sans'", size:12} }, title:{ display:true, text:'Days prayed', font:{size:12} } }
+  requestAnimationFrame(() => {
+    const yearlyWrap = document.getElementById('yearlyChartWrap');
+    const yearlyInner = document.getElementById('yearlyChartInner');
+    const VISIBLE_YEARS = 10;
+    const wrapWidth = yearlyWrap.clientWidth || 1;
+    const innerWidth = chartYears.length > VISIBLE_YEARS
+      ? Math.round(wrapWidth * (chartYears.length / VISIBLE_YEARS))
+      : wrapWidth;
+    yearlyInner.style.width = innerWidth + 'px';
+
+    if (yearlyChartInstance) yearlyChartInstance.destroy();
+    yearlyChartInstance = new Chart(document.getElementById('yearlyChart'), {
+      type:'bar',
+      data:{
+        labels: chartYears,
+        datasets: PRAYER_NAMES.map(p => ({
+          label: p, data: chartYears.map(y => byYear[y][p]), backgroundColor: colors[p], borderRadius:4, maxBarThickness:16
+        }))
+      },
+      options:{
+        responsive:true, maintainAspectRatio:false,
+        plugins:{ legend:{ position:'bottom', labels:{ boxWidth:10, boxHeight:10, usePointStyle:true, font:{family:"'Work Sans'", size:12} } } },
+        scales:{
+          x:{ grid:{ display:false }, ticks:{ font:{family:"'Work Sans'", size:12} } },
+          y:{ grid:{ color:'rgba(14,58,53,0.06)' }, ticks:{ font:{family:"'Work Sans'", size:12} }, title:{ display:true, text:'Days prayed', font:{size:12} } }
+        }
       }
-    }
+    });
+    yearlyWrap.scrollLeft = yearlyWrap.scrollWidth;
   });
 }
 
