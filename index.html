@@ -899,6 +899,14 @@ function renderSadqaTable(yearFilter){
 
 initializeDailySummaryDefaults();
 loadAll();
+
+document.getElementById('yearlyChartWrap').addEventListener('wheel', function(e){
+  if (this.scrollWidth <= this.clientWidth) return;
+  if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+    this.scrollLeft += e.deltaY;
+    e.preventDefault();
+  }
+}, { passive: false });
 </script>
 </body>
 </html>
