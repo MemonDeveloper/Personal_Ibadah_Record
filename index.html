@@ -194,7 +194,11 @@
   .daily-summary .prayer-item{ padding:10px 12px; border-radius:14px; background:rgba(255,255,255,0.72); border:1px solid rgba(31,77,67,0.1); font-size:13px; color:var(--text); }
   .daily-summary .prayer-item.done{ background:rgba(144,238,144,0.22); border-color:rgba(0,163,108,0.25); color:#0f6b4a; font-weight:600; }
   .daily-summary .prayer-item.pending{ background:rgba(255,255,255,0.72); color:var(--muted); }
-  .chart-wrap{ height:320px; overflow-x:auto; overflow-y:hidden; }
+  .chart-row{ display:flex; height:320px; }
+  .chart-yaxis{ flex:0 0 58px; width:58px; height:100%; display:flex; align-items:center; gap:2px; }
+  .chart-yaxis-title{ writing-mode:vertical-rl; transform:rotate(180deg); font-family:'Work Sans', sans-serif; font-size:11px; color:var(--muted); white-space:nowrap; }
+  .chart-yaxis canvas{ flex:1 1 auto; min-width:0; height:100% !important; }
+  .chart-wrap{ flex:1 1 auto; min-width:0; height:100%; overflow-x:auto; overflow-y:hidden; }
   .chart-wrap-inner{ height:100%; }
   .chart-legend{ display:flex; justify-content:center; flex-wrap:wrap; gap:16px; margin-top:14px; }
   .chart-legend .legend-item{ display:flex; align-items:center; gap:6px; font-family:'Work Sans', sans-serif; font-size:12px; color:var(--text); }
@@ -314,7 +318,13 @@
       <div class="prayer-grid" id="ringsRow"></div>
 
       <div class="section-title"><span class="section-icon">◌</span><h2>Yearly Trend</h2><span class="section-kicker" id="yearRange"></span></div>
-      <div class="panel"><div class="chart-wrap" id="yearlyChartWrap"><div class="chart-wrap-inner" id="yearlyChartInner"><canvas id="yearlyChart"></canvas></div></div><div class="chart-legend" id="yearlyChartLegend"></div></div>
+      <div class="panel">
+        <div class="chart-row">
+          <div class="chart-yaxis"><span class="chart-yaxis-title">Days prayed</span><canvas id="yearlyChartYAxis"></canvas></div>
+          <div class="chart-wrap" id="yearlyChartWrap"><div class="chart-wrap-inner" id="yearlyChartInner"><canvas id="yearlyChart"></canvas></div></div>
+        </div>
+        <div class="chart-legend" id="yearlyChartLegend"></div>
+      </div>
 
       <div class="section-title"><span class="section-icon">✦</span><h2>Sadaqah Plan</h2><span class="section-kicker" id="sadaqaRange"></span><select class="year-filter" id="sadaqaYearFilter" onchange="onSadqaYearChange()"></select></div>
       <div class="sadaqah-grid">
@@ -352,6 +362,7 @@
 const SHEET_ID = '1lGKEhbhUu9T5CUHOqM4AP8cfY1IHoga5C9Z9jLGiImE';
 const PRAYER_NAMES = ['Fajr','Dhuhr','Asr','Maghrib','Isha'];
 let yearlyChartInstance = null;
+let yearlyYAxisChartInstance = null;
 
 function gvizUrl(sheetName){
   return `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(sheetName)}&_=${Date.now()}`;
@@ -605,6 +616,11 @@ function renderPrayerStats(rows){
     `<span class="legend-item"><span class="legend-swatch" style="background:${colors[p]}"></span>${p}</span>`
   ).join('');
 
+  const rawMax = Math.max(1, ...chartYears.flatMap(y => PRAYER_NAMES.map(p => byYear[y][p])));
+  const niceStep = rawMax <= 50 ? 10 : rawMax <= 200 ? 25 : rawMax <= 500 ? 50 : 100;
+  const yMax = Math.ceil(rawMax / niceStep) * niceStep;
+  const yStep = yMax / 5;
+
   requestAnimationFrame(() => {
     const yearlyWrap = document.getElementById('yearlyChartWrap');
     const yearlyInner = document.getElementById('yearlyChartInner');
@@ -625,14 +641,32 @@ function renderPrayerStats(rows){
         }))
       },
       options:{
-        responsive:true, maintainAspectRatio:false,
+        responsive:true, maintainAspectRatio:false, animation:false,
         plugins:{ legend:{ display:false } },
         scales:{
           x:{ grid:{ display:false }, ticks:{ font:{family:"'Work Sans'", size:12} } },
-          y:{ grid:{ color:'rgba(14,58,53,0.06)' }, ticks:{ font:{family:"'Work Sans'", size:12} }, title:{ display:true, text:'Days prayed', font:{size:12} } }
+          y:{ min:0, max:yMax, ticks:{ stepSize:yStep, display:false }, grid:{ color:'rgba(14,58,53,0.06)' }, border:{ display:false } }
         }
       }
     });
+
+    if (yearlyYAxisChartInstance) yearlyYAxisChartInstance.destroy();
+    yearlyYAxisChartInstance = new Chart(document.getElementById('yearlyChartYAxis'), {
+      type:'bar',
+      data:{
+        labels: [''],
+        datasets: PRAYER_NAMES.map(p => ({ label:p, data:[0], backgroundColor:'transparent' }))
+      },
+      options:{
+        responsive:true, maintainAspectRatio:false, animation:false,
+        plugins:{ legend:{ display:false }, tooltip:{ enabled:false } },
+        scales:{
+          x:{ grid:{ display:false }, border:{ display:false }, ticks:{ color:'rgba(0,0,0,0)', font:{family:"'Work Sans'", size:12} } },
+          y:{ min:0, max:yMax, ticks:{ stepSize:yStep, font:{family:"'Work Sans'", size:11} }, grid:{ display:false }, border:{ display:false } }
+        }
+      }
+    });
+
     yearlyWrap.scrollLeft = yearlyWrap.scrollWidth;
   });
 }
