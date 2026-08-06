@@ -221,6 +221,9 @@
 
   .site-footer{ margin-top:36px; padding-top:18px; border-top:1px solid rgba(31,77,67,0.12); display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; color:var(--muted); font-size:12px; }
   .site-footer .footer-note{ display:flex; align-items:center; gap:8px; }
+  .site-footer .footer-actions{ display:flex; align-items:center; gap:14px; }
+  .sheet-link{ display:inline-flex; align-items:center; gap:6px; padding:6px 12px; border-radius:999px; border:1px solid rgba(31,77,67,0.25); color:var(--emerald); font-size:12px; font-weight:600; text-decoration:none; transition:background .2s ease, border-color .2s ease; }
+  .sheet-link:hover{ background:rgba(31,77,67,0.08); border-color:rgba(31,77,67,0.4); }
 
   @keyframes fadeUp{ from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);} }
   @keyframes floatIcon{ 0%,100%{ transform:translateY(0);} 50%{ transform:translateY(-6px);} }
@@ -353,7 +356,10 @@
 
     <footer class="site-footer">
       <div class="footer-note"><svg width="24" height="24" viewBox="0 0 64 64" fill="none" aria-hidden="true"><path d="M20 18h24v28H20z" stroke="#1F4D43" stroke-width="2"/><path d="M24 22h16v20H24z" stroke="#B88A3B" stroke-width="2"/><path d="M28 28h8" stroke="#1F4D43" stroke-width="2"/><path d="M28 34h8" stroke="#1F4D43" stroke-width="2"/><path d="M24 10c4 4 6 7 6 12" stroke="#B88A3B" stroke-width="2" stroke-linecap="round"/><path d="M40 10c-4 4-6 7-6 12" stroke="#B88A3B" stroke-width="2" stroke-linecap="round"/></svg><span>Live from Google Sheets · Islam Timeline</span></div>
-      <span id="lastUpdated"></span>
+      <div class="footer-actions">
+        <a class="sheet-link" id="sheetLink" href="#" target="_blank" rel="noopener noreferrer">Open Google Sheet ↗</a>
+        <span id="lastUpdated"></span>
+      </div>
     </footer>
   </div>
 </div>
@@ -361,6 +367,7 @@
 <script>
 const SHEET_ID = '1lGKEhbhUu9T5CUHOqM4AP8cfY1IHoga5C9Z9jLGiImE';
 const PRAYER_NAMES = ['Fajr','Dhuhr','Asr','Maghrib','Isha'];
+document.getElementById('sheetLink').href = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/edit`;
 let yearlyChartInstance = null;
 let yearlyYAxisChartInstance = null;
 
